@@ -2,7 +2,9 @@ package Timetable
 
 class Timetable (ID: Int, Name: String, StartYear: Int, EndYear: Int, CourseType: Int) {
 
-    var activites: MutableMap<Int, Activity>
+    //CourseType: 0 can be undergraduate, 1 can be postgraduate - (Any thoughts on this?)
+
+    var activites: MutableMap<Int, Activity> // This is useless and will be removed, currently all activities are stored within a 'Day' objects hashmap.
     var modules: MutableMap<Int, com.comp1815.Timetable.Module>
     var table: MutableMap<Int, Week>
 
@@ -43,7 +45,7 @@ class Timetable (ID: Int, Name: String, StartYear: Int, EndYear: Int, CourseType
     }
 
     fun removeModule(ID: Int){
-
+        //When removing a module, this function will iterate through the whole timetable and remove any activities associated with the given module that is being removed.
         for (term in this.table.values){
             for (day in term.days){
                 var time = 9.0
@@ -68,7 +70,7 @@ class Timetable (ID: Int, Name: String, StartYear: Int, EndYear: Int, CourseType
                 }
             }
         }
-
+        //Removes the module from the timetables list of modules.
         this.modules.remove(ID)
     }
 
@@ -99,6 +101,7 @@ class Timetable (ID: Int, Name: String, StartYear: Int, EndYear: Int, CourseType
     }
 
     fun removeActivity(ID: Int){
+        //Not implemented yet, as the activities list will be removed, explained on line 7.
         this.activites.remove(ID)
     }
 
