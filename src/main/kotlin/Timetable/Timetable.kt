@@ -21,11 +21,11 @@ class Timetable (ID: Int, Name: String, StartYear: Int, EndYear: Int, CourseType
                 val TimeSlots = this.table[term]?.days?.get(day)?.TimeSlot
                 if (TimeSlots != null) {
                     for (i in TimeSlots.keys){
-                        val actsList : MutableList<Int> = mutableListOf()
+                        val actsList : MutableList<String> = mutableListOf()
                         TimeSlots[i]?.forEach { acts ->
-                            actsList.add(acts.ID)
+                            actsList.add("(Module ID: ${acts.Module}, Activity ID: ${acts.ID})")
                         }
-                        println("Day: $day, Time Slot: $i - Activity ID(s): ${actsList.toString()}")
+                        println("Day: $day, Time Slot: $i - Activity ID(s): $actsList")
                     }
                 }
             }
@@ -53,14 +53,14 @@ class Timetable (ID: Int, Name: String, StartYear: Int, EndYear: Int, CourseType
                             for (act in day.TimeSlot[time]!!){
                                 if (act.Module == ID){
                                     day.TimeSlot[time]?.remove(act)
-                                    println("If statement: $time, removed $ID")
+                                    println("TimeSlot: $time, removed Module: $ID Activity")
                                 }
                             }
                         }
                         else {
                             if (day.TimeSlot[time]?.get(0)?.Module  == ID){
                                 day.TimeSlot[time]?.removeAt(0)
-                                println("Else statement: $time, removed module $ID activity")
+                                println("TimeSlot: $time, removed Module: $ID Activity")
                             }
                         }
                     }
