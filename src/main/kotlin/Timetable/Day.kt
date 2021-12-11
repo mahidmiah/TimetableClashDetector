@@ -1,7 +1,8 @@
 package Timetable
 
-class Day (){
+class Day (dayInt: Int){
 
+    var dayOfWeek = dayInt
     var TimeSlot = HashMap<Double, MutableList<Activity>?>()
 
     init {

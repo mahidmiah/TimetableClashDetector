@@ -6,7 +6,7 @@ class Week {
 
     init {
         for (i in 0..4) {
-            this.days.add(Day())
+            this.days.add(Day(i))
         }
     }
 
