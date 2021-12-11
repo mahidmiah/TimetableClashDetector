@@ -4,12 +4,11 @@ class Timetable (ID: Int, Name: String, StartYear: Int, EndYear: Int, CourseType
 
     //CourseType: 0 can be undergraduate, 1 can be postgraduate - (Any thoughts on this?)
 
-    var activites: MutableMap<Int, Activity> // This is useless and will be removed, currently all activities are stored within a 'Day' objects hashmap.
     var modules: MutableMap<Int, com.comp1815.Timetable.Module>
     var table: MutableMap<Int, Week>
 
     init {
-        this.activites = mutableMapOf()
+        //this.activites = mutableMapOf()
         this.modules = mutableMapOf()
         this.table = mutableMapOf(1 to Week(), 2 to Week())
         println("Initialized Timetable: - ID: $ID, Course Name: $Name, Start Year: $StartYear, End Year: $EndYear, Course Type: $CourseType")
@@ -101,8 +100,30 @@ class Timetable (ID: Int, Name: String, StartYear: Int, EndYear: Int, CourseType
     }
 
     fun removeActivity(ID: Int){
-        //Not implemented yet, as the activities list will be removed, explained on line 7.
-        this.activites.remove(ID)
+        for (term in this.table.values){
+            for (day in term.days){
+                var time = 9.0
+                while (time < 21.5){
+                    if (day.TimeSlot[time] != null){
+                        if (day.TimeSlot[time]?.size!! > 1){
+                            for (act in day.TimeSlot[time]!!){
+                                if (act.ID == ID){
+                                    day.TimeSlot[time]?.remove(act)
+                                    println("removed Activity ID: $ID")
+                                }
+                            }
+                        }
+                        else {
+                            if (day.TimeSlot[time]?.get(0)?.ID  == ID){
+                                day.TimeSlot[time]?.removeAt(0)
+                                println("removed Activity ID: $ID")
+                            }
+                        }
+                    }
+                    time += 0.5
+                }
+            }
+        }
     }
 
 }
