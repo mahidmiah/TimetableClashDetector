@@ -1,13 +1,12 @@
 package Timetable
 
-class Week {
-
-    var days = mutableListOf<Day>()
-
+class Week(weekNumber: Int) {
+    var weekNumber: Any
+    var days = mutableMapOf<Int, Day>()
     init {
+        this.weekNumber = weekNumber
         for (i in 0..4) {
-            this.days.add(Day(i))
+            this.days[i] = Day(i) //Days 0-4 represent Monday to Friday.
         }
     }
-
 }

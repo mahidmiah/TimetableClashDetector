@@ -1,4 +1,4 @@
-package com.comp1815.Timetable
+package Timetable
 
 class Module (ID: Int, Name: String, IsOptional: Boolean) {
 
