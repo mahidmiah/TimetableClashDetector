@@ -26,8 +26,7 @@ class Activity(ID: Int, ModuleID: Int, StartTime: Double, Duration: Double, Acti
     }
 
     override fun toString(): String {
-        //return "[ID: ${this.ID} - Module: ${this.Module}]"
-        return "ID: ${this.ID}"
+        return "(ID: ${this.ID} - Module: ${this.Module} - Type: ${this.ActivityType})"
     }
 
 }

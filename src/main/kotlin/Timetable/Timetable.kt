@@ -5,10 +5,10 @@ class Timetable (ID: Int, Name: String, StartYear: Int, EndYear: Int, Undergradu
     var CourseType: String
     var table: MutableMap<Int, Year>
     var modules: MutableMap<Int, Module>
-    var Acitivites: MutableMap<Int, Activity>
+    var Activities: MutableMap<Int, Activity>
 
     init {
-        if (Undergraduate == true){
+        if (Undergraduate){
             this.CourseType = "undergraduate"
             this.table = mutableMapOf(1 to Year(1), 2 to Year(2), 3 to Year(3)) //Undergraduate has 3 years.
         }
@@ -17,7 +17,7 @@ class Timetable (ID: Int, Name: String, StartYear: Int, EndYear: Int, Undergradu
             this.table = mutableMapOf(1 to Year(1)) //Postgraduate has 3 years.
         }
         this.modules = mutableMapOf()
-        this.Acitivites = mutableMapOf()
+        this.Activities = mutableMapOf()
 
         println("Initialized Timetable: - ID: $ID, Course Name: $Name, Start Year: $StartYear, End Year: $EndYear, Course Type: $CourseType")
     }
@@ -45,7 +45,7 @@ class Timetable (ID: Int, Name: String, StartYear: Int, EndYear: Int, Undergradu
     fun removeModule(ID: Int){
         //When removing a module, this function will remove all activities associated with the given module that is being removed.
         val IDs = mutableListOf<Int>()
-        for (activity in this.Acitivites.values){
+        for (activity in this.Activities.values){
             if (activity.Module == ID){
                 IDs.add(activity.ID)
             }
@@ -59,7 +59,7 @@ class Timetable (ID: Int, Name: String, StartYear: Int, EndYear: Int, Undergradu
 
     fun addActivity(ID: Int, Year: Int, Term: Int, Week: Int, DayOfWeek: Int, ModuleID: Int, StartTime: Double, Duration: Double, ActivityType: Int){
         val activity = Activity(ID, ModuleID, StartTime, Duration, ActivityType, Year, Term, Week, DayOfWeek)
-        this.Acitivites[ID] = activity
+        this.Activities[ID] = activity
         if (this.table[Year]?.terms?.get(Term)?.weeks?.get(Week)?.days?.get(DayOfWeek)?.TimeSlot?.get(StartTime) == null){
             var x = 0.0
             while (x < Duration + 0.5){
@@ -79,7 +79,7 @@ class Timetable (ID: Int, Name: String, StartYear: Int, EndYear: Int, Undergradu
     }
 
     fun removeActivity(ID: Int){
-        val activity = this.Acitivites[ID]
+        val activity = this.Activities[ID]
         val timeslot = this.table[activity?.Year]?.terms?.get(activity?.Term)?.weeks?.get(activity?.Week)?.days?.get(activity?.Day)?.TimeSlot
 
         var x = activity!!.StartTime
@@ -89,7 +89,7 @@ class Timetable (ID: Int, Name: String, StartYear: Int, EndYear: Int, Undergradu
             if (timeslot?.get(x)?.size!! > 1){ //Checks if the value (a list) is greater than 1, meaning there are multiple activities at the same timeslot (Clash)
                 for(act in timeslot[x]!!){ //Loops through each activity in the timeslot and checks its ID against the one that is being removed.
                     if (act.ID == ID){
-                        timeslot[x]?.remove(act) //The given activity is removed from the timeslot.
+                        timeslot[x]?.remove(act) //The given activity is removed from the timeslots list of activities.
                     }
                 }
             }
@@ -100,7 +100,7 @@ class Timetable (ID: Int, Name: String, StartYear: Int, EndYear: Int, Undergradu
             }
             x += 0.5
         }
-        this.Acitivites.remove(ID)
+        this.Activities.remove(ID)
     }
 
 }
