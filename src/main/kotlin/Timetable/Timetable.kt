@@ -30,46 +30,32 @@ class Timetable (ID: Int, Name: String, StartYear: Int, EndYear: Int, Undergradu
                     for (day in week.days.values){
                         println("Year: ${year.yearNumber} - Term: ${term.termNumber} - Week: ${week.weekNumber} - Day: ${day.dayNumber} - Schedule: ${day.TimeSlot}")
                     }
-                    println("")
+                    println()
                 }
-                println("#################################################################################")
+                println("#".repeat(50))
             }
         }
+        println("-".repeat(300))
     }
 
     fun addModule(ID: Int, Name: String, IsOptional: Boolean){
         this.modules[ID] = Module(ID, Name, IsOptional)
     }
 
-//    fun removeModule(ID: Int){
-//        //When removing a module, this function will iterate through the whole timetable and remove any activities associated with the given module that is being removed.
-//        for (term in this.table.values){
-//            for (day in term.days){
-//                var time = 9.0
-//                while (time < 21.5){
-//                    if (day.TimeSlot[time] != null){
-//                        if (day.TimeSlot[time]?.size!! > 1){
-//                            for (act in day.TimeSlot[time]!!){
-//                                if (act.Module == ID){
-//                                    day.TimeSlot[time]?.remove(act)
-//                                    println("TimeSlot: $time, removed Module: $ID Activity")
-//                                }
-//                            }
-//                        }
-//                        else {
-//                            if (day.TimeSlot[time]?.get(0)?.Module  == ID){
-//                                day.TimeSlot[time]?.removeAt(0)
-//                                println("TimeSlot: $time, removed Module: $ID Activity")
-//                            }
-//                        }
-//                    }
-//                    time += 0.5
-//                }
-//            }
-//        }
-//        //Removes the module from the timetables list of modules.
-//        this.modules.remove(ID)
-//    }
+    fun removeModule(ID: Int){
+        //When removing a module, this function will remove all activities associated with the given module that is being removed.
+        val IDs = mutableListOf<Int>()
+        for (activity in this.Acitivites.values){
+            if (activity.Module == ID){
+                IDs.add(activity.ID)
+            }
+        }
+        for (x in IDs){
+            removeActivity(x)
+        }
+        //Removes the module from the timetables list of modules.
+        this.modules.remove(ID)
+    }
 
     fun addActivity(ID: Int, Year: Int, Term: Int, Week: Int, DayOfWeek: Int, ModuleID: Int, StartTime: Double, Duration: Double, ActivityType: Int){
         val activity = Activity(ID, ModuleID, StartTime, Duration, ActivityType, Year, Term, Week, DayOfWeek)
@@ -100,14 +86,14 @@ class Timetable (ID: Int, Name: String, StartYear: Int, EndYear: Int, Undergradu
         val endTime = activity.StartTime + activity.Duration
 
         while (x < endTime + 0.5){
-            if (timeslot?.get(x)?.size!! > 1){
-                for(act in timeslot[x]!!){
+            if (timeslot?.get(x)?.size!! > 1){ //Checks if the value (a list) is greater than 1, meaning there are multiple activities at the same timeslot (Clash)
+                for(act in timeslot[x]!!){ //Loops through each activity in the timeslot and checks its ID against the one that is being removed.
                     if (act.ID == ID){
-                        timeslot[x]?.remove(act)
+                        timeslot[x]?.remove(act) //The given activity is removed from the timeslot.
                     }
                 }
             }
-            else{
+            else{ //If the else statement runs it means there is only 1 activity in the timeslot (no clash)
                 if (timeslot[x]?.get(0)?.ID == ID){
                     timeslot[x] = null
                 }
