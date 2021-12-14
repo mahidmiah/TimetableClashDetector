@@ -18,7 +18,7 @@ import java.util.*;
 import java.util.List;
 
 public class MainScreen extends JFrame{
-    private final DefaultTableModel TableModel;
+    private DefaultTableModel TableModel;
     private final HashMap<Double, Integer> doubleTimeSlotToInt;
     public Timetable table;
     private JLabel courseNameLabel;
@@ -45,9 +45,10 @@ public class MainScreen extends JFrame{
     private JPanel tablePanel;
     private JScrollPane ScrollPane;
     private JRadioButton Week1RadioButton;
-    private JButton button1;
+    private JButton displayTableButton;
     private JLabel weekLabel;
     private JRadioButton Week2RadioButton;
+    private JButton clashDetectionButton;
 
     public MainScreen(Timetable timetable){
 
@@ -64,6 +65,8 @@ public class MainScreen extends JFrame{
             counter = counter +0.5;
             counter_ ++;
         }
+
+        this.courseNameLabel.setText(timetable.getDisplayLabel());
 
         this.yearAndTermPanel.setBorder(new MatteBorder(0, 0, 0, 1, Color.black));
         this.courseModulesPanel.setBorder(new MatteBorder(0, 0, 0, 1, Color.black));
@@ -90,6 +93,39 @@ public class MainScreen extends JFrame{
         this.setContentPane(this.panelMain);
         this.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
         this.pack();
+
+        if (table.getCourseType().equals("postgraduate")){ //Postgraduate
+            this.year2RadioButton.setEnabled(false);
+            this.year3RadioButton.setEnabled(false);
+        }
+
+        ButtonGroup yearGroupRadioGroup = new ButtonGroup();
+        yearGroupRadioGroup.add(year1RadioButton);
+        year1RadioButton.setActionCommand("1");
+
+        yearGroupRadioGroup.add(year2RadioButton);
+        year2RadioButton.setActionCommand("2");
+
+        yearGroupRadioGroup.add(year3RadioButton);
+        year3RadioButton.setActionCommand("3");
+
+
+        ButtonGroup termGroupRadioGroup = new ButtonGroup();
+        termGroupRadioGroup.add(Term1RadioButton);
+        Term1RadioButton.setActionCommand("1");
+
+        termGroupRadioGroup.add(Term2RadioButton);
+        Term2RadioButton.setActionCommand("2");
+
+
+        ButtonGroup weekGroupRadioGroup = new ButtonGroup();
+        weekGroupRadioGroup.add(Week1RadioButton);
+        Week1RadioButton.setActionCommand("1");
+
+        weekGroupRadioGroup.add(Week2RadioButton);
+        Week2RadioButton.setActionCommand("2");
+
+        update(Integer.parseInt(yearGroupRadioGroup.getSelection().getActionCommand()), Integer.parseInt(termGroupRadioGroup.getSelection().getActionCommand()), Integer.parseInt(weekGroupRadioGroup.getSelection().getActionCommand()), table);
 
         addCourseModuleButton.addActionListener(new ActionListener() {
             @Override
@@ -148,6 +184,13 @@ public class MainScreen extends JFrame{
                 }
             }
         });
+
+        displayTableButton.addActionListener(new ActionListener() {
+            @Override
+            public void actionPerformed(ActionEvent e) {
+                update(Integer.parseInt(yearGroupRadioGroup.getSelection().getActionCommand()), Integer.parseInt(termGroupRadioGroup.getSelection().getActionCommand()), Integer.parseInt(weekGroupRadioGroup.getSelection().getActionCommand()), table);
+            }
+        });
     }
 
     public void updateAtCell(int Row, int Column){
@@ -184,6 +227,9 @@ public class MainScreen extends JFrame{
                         activities.append(act.toString()).append("\n");
                     }
                     this.TableModel.setValueAt(activities, this.doubleTimeSlotToInt.get(slot.getKey()), day.getDayNumber()+1);
+                }
+                else {
+                    this.TableModel.setValueAt("", this.doubleTimeSlotToInt.get(slot.getKey()), day.getDayNumber()+1);
                 }
             }
         }
