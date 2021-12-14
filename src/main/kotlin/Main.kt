@@ -3,10 +3,12 @@ import Timetable.Timetable
 
 fun main(args: Array<String>) {
 
-    val main = MainScreen()
-    main.isVisible = true
+
 
     val timetable1 = Timetable(1, "BSc Computer Science", 2019, 2022, true)
+
+    val main = MainScreen(timetable1)
+    main.isVisible = true
 
     timetable1.addModule(1, "JVM", true)
     timetable1.addModule(2, "HCI", true)
