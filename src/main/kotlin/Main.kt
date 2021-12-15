@@ -5,10 +5,6 @@ import Persistence.DBCreator
 
 fun main(args: Array<String>) {
 
-
-    val main = MainScreen()
-    main.isVisible = true
-
     val dbConnection = SingletonDBConnection.getConnection()
 
     // Uncomment this code if you want to clean the database
@@ -32,8 +28,8 @@ fun main(args: Array<String>) {
 
     timetable1.addActivity(5, 1, 1, 2, 4, 1, 9.0, 1.0, 1)
 
-    val main = MainScreen(timetable1)
-    main.isVisible = true
+    var mainScreen = MainScreen(timetable1)
+    mainScreen.isVisible = true
 
 
 
@@ -48,3 +44,4 @@ fun main(args: Array<String>) {
 
 
 }
+

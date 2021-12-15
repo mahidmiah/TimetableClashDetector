@@ -16,6 +16,7 @@ class DBCreator(val dbConnection: DBConnection) {
         val sqlCommandsFile = cl.getResource("./greenwich_timetables.sq")
         if (sqlCommandsFile != null) {
             println("File of SQL Commands to create Database: " + sqlCommandsFile.path)
+
             val sqlCommandsContent = Files.readAllLines(File(sqlCommandsFile.path).toPath(), Charsets.UTF_8)
             dbCreationQuery = sqlCommandsContent.joinToString("\n")
         } else {
