@@ -305,7 +305,7 @@
                   <cellSelectionEnabled value="true"/>
                   <dropMode value="USE_SELECTION"/>
                   <enabled value="false"/>
-                  <opaque value="false"/>
+                  <opaque value="true"/>
                   <requestFocusEnabled value="true"/>
                   <rowHeight value="30"/>
                 </properties>
