@@ -2,6 +2,10 @@ package Timetable
 
 class Timetable (ID: Int, Name: String, StartYear: Int, EndYear: Int, Undergraduate: Boolean) {
 
+    var displayLabel: String
+    var endYear: Int
+    var startYear: Int
+    var name: String
     var CourseType: String
     var table: MutableMap<Int, Year>
     var modules: MutableMap<Int, Module>
@@ -18,6 +22,12 @@ class Timetable (ID: Int, Name: String, StartYear: Int, EndYear: Int, Undergradu
         }
         this.modules = mutableMapOf()
         this.Activities = mutableMapOf()
+
+        this.name = Name
+        this.startYear = StartYear
+        this.endYear = EndYear
+
+        this.displayLabel = "Course: ${this.name} - (${this.startYear} - ${this.endYear}) - ${this.CourseType}"
 
         println("Initialized Timetable: - ID: $ID, Course Name: $Name, Start Year: $StartYear, End Year: $EndYear, Course Type: $CourseType")
     }
@@ -58,7 +68,7 @@ class Timetable (ID: Int, Name: String, StartYear: Int, EndYear: Int, Undergradu
     }
 
     fun addActivity(ID: Int, Year: Int, Term: Int, Week: Int, DayOfWeek: Int, ModuleID: Int, StartTime: Double, Duration: Double, ActivityType: Int){
-        val activity = Activity(ID, ModuleID, StartTime, Duration, ActivityType, Year, Term, Week, DayOfWeek)
+        val activity = Activity(ID, ModuleID, this.modules.get(ModuleID)?.Name!!, StartTime, Duration, ActivityType, Year, Term, Week, DayOfWeek)
         this.Activities[ID] = activity
         if (this.table[Year]?.terms?.get(Term)?.weeks?.get(Week)?.days?.get(DayOfWeek)?.TimeSlot?.get(StartTime) == null){
             var x = 0.0

@@ -12,4 +12,8 @@ class Module (ID: Int, Name: String, IsOptional: Boolean) {
         this.IsOptional = IsOptional
     }
 
+    override fun toString(): String {
+        return "ID: ${this.ID} - ${this.Name} - Optional: ${this.IsOptional}"
+    }
+
 }
