@@ -97,11 +97,13 @@ class Timetable (ID: Int, Name: String, StartYear: Int, EndYear: Int, Undergradu
 
         while (x < endTime + 0.5){
             if (timeslot?.get(x)?.size!! > 1){ //Checks if the value (a list) is greater than 1, meaning there are multiple activities at the same timeslot (Clash)
+                var toRemove = mutableListOf<Activity>()
                 for(act in timeslot[x]!!){ //Loops through each activity in the timeslot and checks its ID against the one that is being removed.
                     if (act.ID == ID){
-                        timeslot[x]?.remove(act) //The given activity is removed from the timeslots list of activities.
+                        toRemove.add(act) // Counters the ConcurrentModificationException
                     }
                 }
+                timeslot[x]?.removeAll(toRemove) //The given activity is removed from the timeslots list of activities.
             }
             else{ //If the else statement runs it means there is only 1 activity in the timeslot (no clash)
                 if (timeslot[x]?.get(0)?.ID == ID){

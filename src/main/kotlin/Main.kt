@@ -28,7 +28,7 @@ fun main(args: Array<String>) {
 
     timetable1.addActivity(5, 1, 1, 2, 4, 1, 9.0, 1.0, 1)
 
-    var mainScreen = MainScreen(timetable1)
+    val mainScreen = MainScreen(timetable1)
     mainScreen.isVisible = true
 
 

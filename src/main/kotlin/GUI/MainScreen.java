@@ -89,7 +89,7 @@ public class MainScreen extends JFrame{
 
         this.timeTable.setRowHeight(75);
 
-        this.panelMain.setPreferredSize(new Dimension(900, 600));
+        this.panelMain.setPreferredSize(new Dimension(1000, 700));
         this.setContentPane(this.panelMain);
         this.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
         this.pack();
@@ -172,14 +172,15 @@ public class MainScreen extends JFrame{
                 JOptionPane.showMessageDialog(panelMain, panel);
 
                 if (!moduleIDTextField.getText().isEmpty() && !moduleNameTextField.getText().isEmpty() && !optionalChoiceGroup.getSelection().getActionCommand().isEmpty()){
-                    System.out.println("Module ID: " +Integer.parseInt(moduleIDTextField.getText()));
-                    System.out.println("Module Name: " + moduleNameTextField.getText());
-                    System.out.println("Is Optional: " + trueFalseDict.get(optionalChoiceGroup.getSelection().getActionCommand()));
-                    table.addModule(Integer.parseInt(moduleIDTextField.getText()), moduleNameTextField.getText(), trueFalseDict.get(optionalChoiceGroup.getSelection().getActionCommand()));
-                    updateModulesList(table);
+                    if(!timetable.getModules().containsKey(Integer.parseInt(moduleIDTextField.getText()))){
+                        table.addModule(Integer.parseInt(moduleIDTextField.getText()), moduleNameTextField.getText(), trueFalseDict.get(optionalChoiceGroup.getSelection().getActionCommand()));
+                        updateModulesList(table);
+                    }
+                    else {
+                        JOptionPane.showMessageDialog(panelMain, "Module ID already exists!", "Module ID Error", JOptionPane.ERROR_MESSAGE);
+                    }
                 }
                 else{
-                    System.out.println("Error: Missing fields!");
                     JOptionPane.showMessageDialog(panelMain, "Please ensure all fields have correct input!", "Add Module Error", JOptionPane.ERROR_MESSAGE);
                 }
             }
@@ -189,6 +190,34 @@ public class MainScreen extends JFrame{
             @Override
             public void actionPerformed(ActionEvent e) {
                 update(Integer.parseInt(yearGroupRadioGroup.getSelection().getActionCommand()), Integer.parseInt(termGroupRadioGroup.getSelection().getActionCommand()), Integer.parseInt(weekGroupRadioGroup.getSelection().getActionCommand()), table);
+            }
+        });
+
+        removeCourseModuleButton.addActionListener(new ActionListener() {
+            @Override
+            public void actionPerformed(ActionEvent e) {
+                if (courseModuleJList.getSelectedValue() != null){
+                    int result = JOptionPane.showConfirmDialog(panelMain,"Are you sure you will like to remove the module?", "Remove Module",
+                            JOptionPane.YES_NO_OPTION,
+                            JOptionPane.QUESTION_MESSAGE);
+                    if(result == JOptionPane.YES_OPTION){
+                        int moduleID = Integer.parseInt(String.valueOf(courseModuleJList.getSelectedValue().toString().charAt(4)));
+                        timetable.removeModule(moduleID);
+                        update(Integer.parseInt(yearGroupRadioGroup.getSelection().getActionCommand()), Integer.parseInt(termGroupRadioGroup.getSelection().getActionCommand()), Integer.parseInt(weekGroupRadioGroup.getSelection().getActionCommand()), table);
+                        JOptionPane.showMessageDialog(panelMain, "Module and all relevant activities have successfully been removed.", "Success", JOptionPane.PLAIN_MESSAGE);
+
+                    }
+                    else if (result == JOptionPane.NO_OPTION){
+                        JOptionPane.showMessageDialog(panelMain, "Module has not been removed", "Module removal", JOptionPane.PLAIN_MESSAGE);
+                    }
+                    else {
+                        JOptionPane.showMessageDialog(panelMain, "No Module has been selected", "Remove Module Error", JOptionPane.ERROR_MESSAGE);
+                    }
+                }
+                else {
+                    JOptionPane.showMessageDialog(panelMain, "No Module has been selected", "Remove Module Error", JOptionPane.ERROR_MESSAGE);
+                }
+
             }
         });
     }
