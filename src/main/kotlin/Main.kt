@@ -1,10 +1,22 @@
 import GUI.MainScreen
 import Timetable.Timetable
+import Persistence.DBConnection.SingletonDBConnection
+import Persistence.DBCreator
 
 fun main(args: Array<String>) {
 
     val main = MainScreen()
     main.isVisible = true
+
+    val dbConnection = SingletonDBConnection.getConnection()
+
+    // Uncomment this code if you want to clean the database
+    //dbConnection.resetFile()
+
+    dbConnection.connect()
+    val dbCreator = DBCreator(dbConnection)
+    dbCreator.buildDatabase()
+
 
     val timetable1 = Timetable(1, "BSc Computer Science", 2019, 2022, true)
 
