@@ -15,7 +15,7 @@ fun main(args: Array<String>) {
     dbCreator.buildDatabase()
 
 
-    val timetable1 = Timetable(1, "BSc Computer Science", 2019, 2022, false)
+    val timetable1 = Timetable(1, "BSc Computer Science", 2019, 2022, true)
 
 
     timetable1.addModule(1, "JVM", true)

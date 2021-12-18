@@ -1,5 +1,6 @@
 package GUI;
 
+import ClashDetectionKotlin.KotlinDetector;
 import Timetable.Timetable;
 import Timetable.Week;
 import Timetable.Day;
@@ -359,6 +360,14 @@ public class MainScreen extends JFrame{
                 }
             }
         });
+
+        clashDetectionButton.addActionListener(new ActionListener() {
+            @Override
+            public void actionPerformed(ActionEvent e) {
+                KotlinDetector detector = new KotlinDetector(timetable);
+                detector.detect();
+            }
+        });
     }
 
     public void updateAtCell(int Row, int Column){
@@ -402,11 +411,13 @@ public class MainScreen extends JFrame{
             }
         }
         this.timeTable.setModel(this.TableModel);
+
+        KotlinDetector detector = new KotlinDetector(Timetable);
         MultiLineCellRenderer renderer = new MultiLineCellRenderer();
-        renderer.clashDetectionPainter(1, 1);
+        renderer.clashDetectionInitiate(detector.detect(), Year, Term, Week);
 
         this.timeTable.setDefaultRenderer(Object.class, renderer);
-        this.timeTable.getColumnModel().getColumn(0).setPreferredWidth(10);
+        this.timeTable.getColumnModel().getColumn(0).setPreferredWidth(2);
 
         updateModulesList(Timetable);
 
