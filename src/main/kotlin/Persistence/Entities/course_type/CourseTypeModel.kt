@@ -25,7 +25,18 @@ public class CourseTypeModel(
         val insertQuery = "INSERT INTO warehouses(id_course_type,label) VALUES(?,?)";
 
 
-        // Iterate through class instance properties/attributes
+
+        /*
+        Iterate through class instance properties/attributes
+        Posts/Articles about it:
+        https://stackoverflow.com/questions/46512924/kotlin-get-field-annotation-always-empty
+        https://stackoverflow.com/questions/51218309/finding-field-annotations-using-objclass-declaredmemberproperties?noredirect=1&lq=1
+        https://stackoverflow.com/questions/35525122/kotlin-data-class-how-to-read-the-value-of-property-if-i-dont-know-its-name-at
+        http://tutorials.jenkov.com/java-reflection/annotations.html
+        http://tutorials.jenkov.com/java/annotations.html
+        https://stackoverflow.com/questions/1805200/retrieve-java-annotation-attribute
+
+        */
         for (member in this::class.memberProperties) {
             val javaField = member.javaField;
             if (javaField != null) {
