@@ -2,6 +2,7 @@ import GUI.MainScreen
 import Timetable.Timetable
 import Persistence.DBConnection.SingletonDBConnection
 import Persistence.DBCreator
+import Persistence.Entities.course_type.CourseTypeModel
 
 fun main(args: Array<String>) {
 
@@ -13,6 +14,10 @@ fun main(args: Array<String>) {
     dbConnection.connect()
     val dbCreator = DBCreator(dbConnection)
     dbCreator.buildDatabase()
+
+    val example: CourseTypeModel = CourseTypeModel(0, "undergraduate", "")
+    example.save(dbConnection.getConnection()!!)
+
 
 
     val timetable1 = Timetable(1, "BSc Computer Science", 2019, 2022, true)

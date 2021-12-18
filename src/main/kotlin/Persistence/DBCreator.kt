@@ -36,6 +36,7 @@ class DBCreator(val dbConnection: DBConnection) {
             var count: Int = 0;
             while(res.next()){
                 count += 1;
+
                 break
             }
             // If it does not exist, then create the tables
