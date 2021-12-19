@@ -43,6 +43,16 @@ open class Model(val tableName: String) {
          */
         fun getListOfColumns(model: Model) : ArrayList<ColumnDetailsJavaField>{ // ArrayList<KProperty1<out Model, *>>
             val columnList: ArrayList<ColumnDetailsJavaField> = arrayListOf();
+
+            // Iterate though the list of instance members(attributes, methods, e.t.c)
+            val columnList2 = model::class.memberProperties
+                .filter { m ->
+                    m.javaField != null && m.javaField!!.getAnnotation(Column::class.java) != null
+                }.map { m ->
+                    ColumnDetailsJavaField(m.javaField!!)
+                }
+            /*
+            IMPERATIVE WAY
             for (member in model::class.memberProperties) {
                 val javaField = member.javaField;
                 if (javaField != null) {
@@ -55,21 +65,37 @@ open class Model(val tableName: String) {
                         }
                     }
                 }
-
-
-
             }
-            return columnList
+            */
+
+            return ArrayList(columnList2)
         }
+
+        /**
+         * Content of the Insert Query
+         * @param query Generated query
+         * @param columns Fields that hold value
+         */
         class InsertQueryPreparation(val query: String, val columns: ArrayList<ColumnDetailsJavaField>) {
 
         }
 
+        /**
+         * Result of the INSERT statement
+         * @param affectedRows Number of affected rows after insert
+         * @param generatedKeys Generated IDS
+         */
         class InsertResult(val affectedRows: Int, val generatedKeys: ArrayList<Int>)
 
 
     }
 
+    /**
+     * Sets variable statements based on instance attributes' properties/type
+     * @param pstmt Prepared Statement
+     * @param statementIndex Variable Statement Index
+     * @param field JavaField from the Reflection
+     */
     private fun setStatementViaJavaField(pstmt: PreparedStatement, statementIndex: Int, field: Field){
 
         val columnDetails = ColumnDetails(field)
@@ -100,15 +126,23 @@ open class Model(val tableName: String) {
 
         field.setAccessible(false);
     }
+
+    /**
+     * Generate INSERT SQL statement based on instance attributes properties.
+     */
     private fun generateInsertQuery() : InsertQueryPreparation {
-        var columns = getListOfColumns(this);
-        var questionMarks = columns.map { _ -> "?" }.joinToString(",")
-        val columnOrder = columns.map{f -> f.name }.joinToString(",")
+        val columns = getListOfColumns(this);
+        val questionMarks = columns.map { _ -> "?" }.joinToString(",")
+        val columnOrder = columns.map{c -> c.name }.joinToString(",")
 
         return InsertQueryPreparation(query="INSERT INTO ${tableName} (${columnOrder})\n" +
                 "VALUES(${questionMarks});", columns=columns) ;
     }
 
+
+    /**
+     * Saves the content of the instance to the Database
+     */
     public fun save(dbConnector: DBConnector) : InsertResult{
         val insertQueryPrep = generateInsertQuery()
         val query = insertQueryPrep.query

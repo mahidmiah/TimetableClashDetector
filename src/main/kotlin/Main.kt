@@ -18,7 +18,6 @@ fun main(args: Array<String>) {
 
 
 
-
     val timetable1 = Timetable(1, "BSc Computer Science", 2019, 2022, true)
 
 

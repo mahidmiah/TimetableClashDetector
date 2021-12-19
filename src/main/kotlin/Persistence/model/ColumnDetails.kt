@@ -3,8 +3,19 @@ package Persistence.model
 import Persistence.annotations.Column
 import java.lang.reflect.Field
 
+
+/**
+ * Column Details
+ */
 open class ColumnDetails() {
+    /**
+     * Name of the column in the database
+     */
     var name: String? = null;
+
+    /**
+     * Type of the column
+     */
     var type: Int = -1;
 
     companion object {
