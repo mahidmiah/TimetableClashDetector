@@ -109,11 +109,11 @@ class DBConnector(val dbFileLocation: String) {
 
             try {
                 val result = statementExecutor(conn)
+                conn.close()
                 return result
             } catch (e: Exception) {
-                throw e;
-            } finally {
                 conn.close()
+                throw e;
             }
 
 
