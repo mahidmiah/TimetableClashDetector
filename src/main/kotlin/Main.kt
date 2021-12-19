@@ -15,7 +15,7 @@ fun main(args: Array<String>) {
     val dbCreator = DBCreator(dbConnection)
     dbCreator.buildDatabase()
 
-    val example: CourseTypeModel = CourseTypeModel(0, "undergraduate", "")
+    val example: CourseTypeModel = CourseTypeModel(null, "undergraduate", "")
     example.save(dbConnection.getConnection()!!)
 
 

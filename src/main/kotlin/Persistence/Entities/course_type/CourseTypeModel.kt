@@ -1,19 +1,15 @@
 package Persistence.Entities.course_type;
 import Persistence.Entities.Model
 import Persistence.annotations.Column
-import java.lang.Exception
-import java.lang.reflect.Field
+import Persistence.annotations.ColumnVars
 import java.sql.Connection
-import java.sql.PreparedStatement
 import java.sql.ResultSet
-import kotlin.reflect.full.declaredMemberProperties
-import kotlin.reflect.full.findAnnotation
 import kotlin.reflect.full.memberProperties
 import kotlin.reflect.jvm.javaField
 
 public class CourseTypeModel(
-    @field:Column() val id_course_type: Int,
-    @field:Column() val label: String,
+    @field:Column(type=ColumnVars.INT) public val id_course_type: Int?,
+    @field:Column(type=ColumnVars.TEXT) public val label: String,
     val test: String) : Model("course_types") {
 
 
@@ -21,7 +17,7 @@ public class CourseTypeModel(
         rs.getInt("id_course_type"),
         rs.getString("label"), "")
 
-    fun save(conn: Connection){
+    fun saveAlt(conn: Connection){
         val insertQuery = "INSERT INTO warehouses(id_course_type,label) VALUES(?,?)";
 
 
@@ -45,7 +41,10 @@ public class CourseTypeModel(
                     if (item is Column) {
                         val nameOfField = javaField.name // Name of the Field
                         val value = javaField.get(this) // Value of the Field of the instance
-                        println(nameOfField + "=" + value)
+                        val columnType = item.type
+                        val variableType = javaField.type
+                        println("variableType: " + variableType)
+                        println("${nameOfField}<${columnType}>=${value})");
                     }
                 }
                 if (FieldColumn != null) {
