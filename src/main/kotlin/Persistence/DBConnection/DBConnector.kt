@@ -5,7 +5,7 @@ import java.sql.DriverManager
 import java.sql.SQLException
 
 /**
- * Class that connects to a database file.
+ * Class that handles connections to the database.
  */
 class DBConnector(val dbFileLocation: String) {
     private var conn: Connection? = null
@@ -21,17 +21,34 @@ class DBConnector(val dbFileLocation: String) {
         return false;
     }
 
+    /**
+     * Gets java.sql.Connection instance
+     */
     fun getConnection() : Connection? {
-        this.connect()
         return this.conn;
     }
 
+    /**
+     * Creates an open connection
+     */
+    fun getOpenConnection() : Connection? {
+        this.connect()
+        return this.getConnection()
+    }
+
+    /**
+     * Creates File for DB
+     */
     fun createFile(){
         if(!File(this.dbFileLocation).exists()){
             File(this.dbFileLocation).createNewFile()
         }
     }
 
+    /**
+     * Deletes file and restores it.
+     * It tries to reconnect if the connection was open.
+     */
     fun resetFile(){
         var shouldReconnect = this.isConnected()
 
@@ -54,6 +71,9 @@ class DBConnector(val dbFileLocation: String) {
 
     }
 
+    /**
+     * Connects to the database. The connections keeps active after executing it.
+     */
     fun connect(){
         if (this.isConnected()) {
             return
@@ -77,12 +97,27 @@ class DBConnector(val dbFileLocation: String) {
         }
     }
 
+    /**
+     * This method allows to make a safe connection while executing SQL Statements.
+     * It makes sure the connection is properly closed after any statement
+     * that is inside the `statementExecutor` function
+     * @param statementExecutor Function that holds a `Connection` as argument.
+     */
     fun <T> startStatementEnvironment(statementExecutor: (conn: Connection) -> T): T {
-        val conn = this.getConnection()
+        val conn = this.getOpenConnection()
         if (conn != null) {
-            val result = statementExecutor(conn)
-            conn.close()
-            return result
+
+            try {
+                val result = statementExecutor(conn)
+                return result
+            } catch (e: Exception) {
+                throw e;
+            } finally {
+                conn.close()
+            }
+
+
+
         }
         throw Exception("Could not execute statement due to missing connection.")
     }

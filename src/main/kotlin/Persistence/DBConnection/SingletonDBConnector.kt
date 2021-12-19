@@ -3,7 +3,7 @@ package Persistence.DBConnection
 import Vars.ConfigVars
 
 /**
- * Singleton to hold a single DBConnection throughout the runtime
+ * Singleton to hold a single DBconnector throughout the runtime
  */
 class SingletonDBConnector {
     companion object {

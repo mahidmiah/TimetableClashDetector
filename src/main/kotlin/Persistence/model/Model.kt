@@ -1,50 +1,57 @@
 package Persistence.model
 import Persistence.DBConnection.DBConnector
 import Persistence.annotations.Column
-import Persistence.annotations.ColumnVars
+import Persistence.annotations.ColumnTypes
 import java.lang.reflect.Field
 import java.sql.*
-import kotlin.reflect.KProperty1
 import kotlin.reflect.full.memberProperties
 import kotlin.reflect.jvm.javaField
 
+/**
+ Resources about Reflections:
+ Iterate through class instance properties/attributes
+    Posts/Articles about it:
+    https://stackoverflow.com/questions/46512924/kotlin-get-field-annotation-always-empty
+    https://stackoverflow.com/questions/51218309/finding-field-annotations-using-objclass-declaredmemberproperties?noredirect=1&lq=1
+    https://stackoverflow.com/questions/35525122/kotlin-data-class-how-to-read-the-value-of-property-if-i-dont-know-its-name-at
+    http://tutorials.jenkov.com/java-reflection/annotations.html
+    http://tutorials.jenkov.com/java/annotations.html
+    https://stackoverflow.com/questions/1805200/retrieve-java-annotation-attribute
+ */
 
+/**
+ * Class Model to identify an entity/table in the Database.
+ *
+ * It uses some techinques of reflection to map the information of the database
+ * with Kotlin objects.
+ * You can assign attributes to Database columns by adding annotations
+ *
+ *
+ * `@field:Column(name="id_course_type", type=ColumnTypes.INTEGER) public val id_course_type: Int?`
+ *
+ */
 open class Model(val tableName: String) {
     companion object {
 
-
-        fun getColumnNameFromField(field: Field) : String {
-
-            val columnAnnotation = field.getAnnotation(Column::class.java)
-            if (columnAnnotation != null && columnAnnotation.name != "") {
-                return columnAnnotation.name
-            }
-            return field.name;
-        }
-
-        fun getColumnDetails(field: Field) : Column {
-            val columnAnnotation = field.getAnnotation(Column::class.java)
-            if (columnAnnotation != null) {
-                return columnAnnotation
-            }
-            throw Exception("NOT A COLUMN")
-        }
-
-        fun getColumnType(field: Field) : Int {
-
-            val columnDetails: Column = getColumnDetails(field)
-            return columnDetails.type
-
-        }
-        fun getListOfColumns(model: Model) : ArrayList<KProperty1<out Model, *>>{
-            val columnList: ArrayList<KProperty1<out Model, *>> = arrayListOf();
+        /**
+         * Returns a list of attributes that are used as Columns to map their equivalent Database columns.
+         * Example:
+         * The attribute `idCourseType`<INT> might represent the column "id_course_type" in the database.
+         * So you you would declare:
+         *
+         * `@field:Column(name="id_course_type", type=ColumnVars.INTEGER) public val id_course_type: Int?`
+         */
+        fun getListOfColumns(model: Model) : ArrayList<ColumnDetailsJavaField>{ // ArrayList<KProperty1<out Model, *>>
+            val columnList: ArrayList<ColumnDetailsJavaField> = arrayListOf();
             for (member in model::class.memberProperties) {
                 val javaField = member.javaField;
                 if (javaField != null) {
                     val FieldColumn = javaField.getAnnotation(Column::class.java)
                     for (item in javaField.annotations) {
+
+
                         if (item is Column) {
-                            columnList.add(member)
+                            columnList.add(ColumnDetailsJavaField(member.javaField!!))
                         }
                     }
                 }
@@ -54,29 +61,32 @@ open class Model(val tableName: String) {
             }
             return columnList
         }
-        class InsertQueryPreparation(val query: String, val columns: ArrayList<KProperty1<out Model, *>>) {
+        class InsertQueryPreparation(val query: String, val columns: ArrayList<ColumnDetailsJavaField>) {
 
         }
 
-        class InsertResult(val affectedRows: Int, generatedKeys: ArrayList<Int>)
+        class InsertResult(val affectedRows: Int, val generatedKeys: ArrayList<Int>)
 
 
     }
 
     private fun setStatementViaJavaField(pstmt: PreparedStatement, statementIndex: Int, field: Field){
-        val columnType = getColumnType(field)
+
+        val columnDetails = ColumnDetails(field)
+
+        val columnType = columnDetails.type
         field.setAccessible(true); // Needed to use the "get" method
 
         try {
             val value = field.get(this)
-            if (columnType == ColumnVars.TEXT) {
+            if (columnType == ColumnTypes.TEXT) {
                 if (value == null)  {
                     pstmt.setNull(statementIndex, Types.VARCHAR)
                 } else {
                     pstmt.setString(statementIndex, field.get(this) as String?)
                 }
 
-            } else if (columnType == ColumnVars.INTEGER) {
+            } else if (columnType == ColumnTypes.INTEGER) {
                 if (value == null)  {
                     pstmt.setNull(statementIndex, Types.INTEGER)
                 } else {
@@ -93,7 +103,7 @@ open class Model(val tableName: String) {
     private fun generateInsertQuery() : InsertQueryPreparation {
         var columns = getListOfColumns(this);
         var questionMarks = columns.map { _ -> "?" }.joinToString(",")
-        val columnOrder = columns.map{f -> getColumnNameFromField(f.javaField!!) }.joinToString(",")
+        val columnOrder = columns.map{f -> f.name }.joinToString(",")
 
         return InsertQueryPreparation(query="INSERT INTO ${tableName} (${columnOrder})\n" +
                 "VALUES(${questionMarks});", columns=columns) ;
@@ -109,7 +119,7 @@ open class Model(val tableName: String) {
             for (col in insertQueryPrep.columns) {
                 println(i)
                 i += 1;
-                val field = col.javaField
+                val field = col.attrJavaField
                 if (field != null) {
                     this.setStatementViaJavaField(pstmt, i, field)
                 }

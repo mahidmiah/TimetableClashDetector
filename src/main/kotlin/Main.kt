@@ -14,8 +14,8 @@ fun main(args: Array<String>) {
     val dbCreator = DBCreator(dbConnector)
     dbCreator.buildDatabase()
 
-    val example: CourseTypeModel = CourseTypeModel(null, "undergraduate", "")
-    example.save(dbConnector)
+    println("DATABASE LOCATION: " + dbConnector.dbFileLocation)
+
 
 
 

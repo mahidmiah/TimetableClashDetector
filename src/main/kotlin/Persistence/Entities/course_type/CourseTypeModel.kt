@@ -1,22 +1,25 @@
 package Persistence.Entities.course_type;
 import Persistence.model.Model
 import Persistence.annotations.Column
-import Persistence.annotations.ColumnVars
+import Persistence.annotations.ColumnTypes
 import java.sql.Connection
 import java.sql.ResultSet
-import kotlin.reflect.full.memberProperties
-import kotlin.reflect.jvm.javaField
 
 public class CourseTypeModel(
-    @field:Column(type=ColumnVars.INT) public val id_course_type: Int?,
-    @field:Column(type=ColumnVars.TEXT) public val label: String,
-    val test: String) : Model("course_types") {
+    @field:Column(type=ColumnTypes.INTEGER) public val id_course_type: Int?,
+    @field:Column(type=ColumnTypes.TEXT) public val label: String
+    ) : Model("course_types") {
 
 
     constructor(rs: ResultSet) : this(
         rs.getInt("id_course_type"),
-        rs.getString("label"), "")
+        rs.getString("label"))
 
+
+    /**
+     * Just here for information sake
+     */
+    @Deprecated("Do not use Just here for information sake")
     fun saveAlt(conn: Connection){
         val insertQuery = "INSERT INTO warehouses(id_course_type,label) VALUES(?,?)";
 
@@ -32,7 +35,7 @@ public class CourseTypeModel(
         http://tutorials.jenkov.com/java/annotations.html
         https://stackoverflow.com/questions/1805200/retrieve-java-annotation-attribute
 
-        */
+
         for (member in this::class.memberProperties) {
             val javaField = member.javaField;
             if (javaField != null) {
@@ -56,6 +59,8 @@ public class CourseTypeModel(
 
 
         }
+        */
+
         /*
         try {
             val pstmt: PreparedStatement = conn.prepareStatement(insertQuery)
