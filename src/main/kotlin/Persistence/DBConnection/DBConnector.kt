@@ -7,8 +7,12 @@ import java.sql.SQLException
 /**
  * Class that connects to a database file.
  */
-class DBConnection(val dbFileLocation: String) {
+class DBConnector(val dbFileLocation: String) {
     private var conn: Connection? = null
+
+    abstract class StatementExecutor {
+        abstract fun execute(sqlConnection: Connection?)
+    }
 
     fun isConnected() : Boolean {
         if (conn != null) {
@@ -18,6 +22,7 @@ class DBConnection(val dbFileLocation: String) {
     }
 
     fun getConnection() : Connection? {
+        this.connect()
         return this.conn;
     }
 
@@ -70,5 +75,15 @@ class DBConnection(val dbFileLocation: String) {
         } catch (e: SQLException) {
             println(e.message);
         }
+    }
+
+    fun <T> startStatementEnvironment(statementExecutor: (conn: Connection) -> T): T {
+        val conn = this.getConnection()
+        if (conn != null) {
+            val result = statementExecutor(conn)
+            conn.close()
+            return result
+        }
+        throw Exception("Could not execute statement due to missing connection.")
     }
 }

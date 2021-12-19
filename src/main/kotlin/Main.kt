@@ -1,22 +1,21 @@
 import GUI.MainScreen
 import Timetable.Timetable
-import Persistence.DBConnection.SingletonDBConnection
+import Persistence.DBConnection.SingletonDBConnector
 import Persistence.DBCreator
 import Persistence.Entities.course_type.CourseTypeModel
 
 fun main(args: Array<String>) {
 
-    val dbConnection = SingletonDBConnection.getConnection()
+    val dbConnector = SingletonDBConnector.getConnector()
 
     // Uncomment this code if you want to clean the database
     //dbConnection.resetFile()
 
-    dbConnection.connect()
-    val dbCreator = DBCreator(dbConnection)
+    val dbCreator = DBCreator(dbConnector)
     dbCreator.buildDatabase()
 
     val example: CourseTypeModel = CourseTypeModel(null, "undergraduate", "")
-    example.save(dbConnection.getConnection()!!)
+    example.save(dbConnector)
 
 
 

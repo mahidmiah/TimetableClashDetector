@@ -1,5 +1,5 @@
 package Persistence.Entities.course_type;
-import Persistence.Entities.Model
+import Persistence.model.Model
 import Persistence.annotations.Column
 import Persistence.annotations.ColumnVars
 import java.sql.Connection

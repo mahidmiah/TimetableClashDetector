@@ -4,5 +4,5 @@ package Persistence.annotations
 @Retention(AnnotationRetention.RUNTIME)
 annotation class Column(
     val name: String = "",
-    val type: String = ""
+    val type: kotlin.Int = -1
 )

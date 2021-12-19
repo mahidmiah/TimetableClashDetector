@@ -1,9 +1,11 @@
 package Persistence.annotations
 
+import java.sql.Types
+
 class ColumnVars {
     companion object {
-        const val INT = "INTEGER"
-        const val TEXT = "TEXT"
+        const val INTEGER = Types.INTEGER
+        const val TEXT = Types.VARCHAR
 
     }
 }
