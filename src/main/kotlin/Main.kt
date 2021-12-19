@@ -3,13 +3,30 @@ import Timetable.Timetable
 import Persistence.DBConnection.SingletonDBConnector
 import Persistence.DBCreator
 import Persistence.Entities.course_type.CourseTypeModel
+import java.security.AccessControlException
+import java.util.logging.Logger
+
+import kotlin.system.exitProcess
 
 fun main(args: Array<String>) {
 
     val dbConnector = SingletonDBConnector.getConnector()
-
+    val logger = Logger.getLogger("main")
     // Uncomment this code if you want to clean the database
-    //dbConnection.resetFile()
+    try {
+        dbConnector.resetFile()
+
+    } catch (e: AccessControlException) {
+
+
+        logger.warning(e.stackTraceToString());
+        logger.warning("Error(AccessControlException): MAKE SURE NOTHING IS ACCESSING THE FILE: " + dbConnector.dbFileLocation)
+        exitProcess(1)
+    } catch(e: Exception) {
+        println(e)
+        exitProcess(1)
+    }
+
 
     val dbCreator = DBCreator(dbConnector)
     dbCreator.buildDatabase()

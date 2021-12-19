@@ -55,7 +55,11 @@ CREATE TABLE users (
   first_name TEXT, 
   last_name TEXT, 
   passw TEXT 
-); 
+);
+
+INSERT INTO users (email, first_name, last_name, passw)
+VALUES ("example@gmail.com", "John", "Doe",
+"daef4953b9783365cad6615223720506cc46c5167cd16ab500fa597aa08ff964eb24fb19687f34d7665f778fcb6c5358fc0a5b81e1662cf90f73a2671c53f991");
  
 CREATE TABLE activities ( 
   id_activitiy INTEGER PRIMARY KEY,
