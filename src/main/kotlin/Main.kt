@@ -7,6 +7,7 @@ import Persistence.Entities.course_type.CourseTypeModel
 import Persistence.Entities.course_type.CourseTypeResultSetToModel
 import Persistence.model.Model
 import Persistence.model.SelectAll
+import Persistence.seeds.compsci.MainCompSciSeed
 import java.security.AccessControlException
 import java.sql.ResultSet
 import java.sql.Statement
@@ -52,7 +53,7 @@ fun main(args: Array<String>) {
     }
 
 
-
+    MainCompSciSeed().seed(dbConnector)
     val timetable1 = Timetable(1, "BSc Computer Science", 2019, 2022, true)
 
 

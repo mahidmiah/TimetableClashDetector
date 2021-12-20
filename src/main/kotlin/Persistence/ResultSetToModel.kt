@@ -12,5 +12,5 @@ abstract class ResultSetToModel<T: Model> {
         }
         return arrayList
     }
-   abstract fun rsToModel(resultSet: ResultSet) : T
+   abstract fun rsToModel(rs: ResultSet) : T
 }

@@ -1,6 +1,6 @@
 package Timetable
 
-class Timetable (ID: Int, Name: String, StartYear: Int, EndYear: Int, Undergraduate: Boolean) {
+class Timetable (ID: Int? = null, Name: String, StartYear: Int, EndYear: Int, Undergraduate: Boolean) {
 
     var displayLabel: String
     var endYear: Int

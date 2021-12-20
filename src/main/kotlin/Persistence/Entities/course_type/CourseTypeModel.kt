@@ -10,6 +10,10 @@ public class CourseTypeModel(
     @field:Column(type=ColumnTypes.TEXT) public val label: String? = null
     ) : Model("course_types") {
 
+    companion object {
+        const val UNDERGRADUATE="undergraduate";
+        const val POSTGRADUATE="postgraduate";
+    }
 
     /**
      * Just here for information sake
