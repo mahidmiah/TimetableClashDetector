@@ -1,6 +1,6 @@
 package Persistence
 
-import Persistence.DBConnection.DBConnection
+import Persistence.DBConnection.DBConnector
 import java.io.File
 import java.nio.file.Files
 import java.sql.ResultSet
@@ -9,7 +9,7 @@ import java.sql.Statement
 /**
  * Class to create database tables/schema
  */
-class DBCreator(val dbConnection: DBConnection) {
+class DBCreator(val dbConnector: DBConnector) {
     fun buildDatabase(){
         var dbCreationQuery = ""
         val cl: ClassLoader = ClassLoader.getSystemClassLoader()
@@ -24,11 +24,7 @@ class DBCreator(val dbConnection: DBConnection) {
         }
 
 
-
-        val conn = this.dbConnection.getConnection()
-
-
-        if (conn != null) {
+        dbConnector.startStatementEnvironment { conn ->
             var stmt: Statement = conn.createStatement()
 
             // Query to check if the table "users" already exists
@@ -45,7 +41,9 @@ class DBCreator(val dbConnection: DBConnection) {
                 val updateRes = stmt.executeUpdate(dbCreationQuery)
                 println(updateRes)
             }
-
         }
+
+
+
     }
 }

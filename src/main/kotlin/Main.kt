@@ -1,22 +1,53 @@
 import GUI.MainScreen
 import Timetable.Timetable
-import Persistence.DBConnection.SingletonDBConnection
+import Persistence.DBConnection.SingletonDBConnector
 import Persistence.DBCreator
+import Persistence.Entities.course.CourseModel
 import Persistence.Entities.course_type.CourseTypeModel
+import Persistence.Entities.course_type.CourseTypeResultSetToModel
+import Persistence.model.Model
+import Persistence.model.SelectAll
+import java.security.AccessControlException
+import java.sql.ResultSet
+import java.sql.Statement
+import java.util.logging.Logger
+
+import kotlin.system.exitProcess
 
 fun main(args: Array<String>) {
 
-    val dbConnection = SingletonDBConnection.getConnection()
-
+    val dbConnector = SingletonDBConnector.getConnector()
+    val logger = Logger.getLogger("main")
     // Uncomment this code if you want to clean the database
-    //dbConnection.resetFile()
+    try {
+        dbConnector.resetFile()
 
-    dbConnection.connect()
-    val dbCreator = DBCreator(dbConnection)
+    } catch (e: AccessControlException) {
+
+
+        logger.warning(e.stackTraceToString());
+        logger.warning("Error(AccessControlException): MAKE SURE NOTHING IS ACCESSING THE FILE: " + dbConnector.dbFileLocation)
+        exitProcess(1)
+    } catch(e: Exception) {
+        println(e)
+        exitProcess(1)
+    }
+
+
+    val dbCreator = DBCreator(dbConnector)
     dbCreator.buildDatabase()
 
-    val example: CourseTypeModel = CourseTypeModel(0, "undergraduate", "")
-    example.save(dbConnection.getConnection()!!)
+    println("DATABASE LOCATION: " + dbConnector.dbFileLocation)
+
+    val courseTypes = dbConnector.rawSelectWithModel("SELECT * FROM ${CourseTypeModel().tableName}", CourseTypeResultSetToModel())
+    val courseTypesRaw = dbConnector.rawSelect("SELECT * FROM ${CourseTypeModel().tableName}")
+    println(courseTypesRaw)
+    if (courseTypesRaw != null) {
+        courseTypesRaw.forEach { (k, v) -> println(k + " " + v) }
+    }
+    for (courseType in courseTypes) {
+        println("Course Type: " + courseType.label);
+    }
 
 
 
