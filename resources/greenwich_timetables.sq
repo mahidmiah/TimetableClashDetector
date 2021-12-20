@@ -60,15 +60,17 @@ CREATE TABLE users (
 INSERT INTO users (email, first_name, last_name, passw)
 VALUES ("example@gmail.com", "John", "Doe",
 "daef4953b9783365cad6615223720506cc46c5167cd16ab500fa597aa08ff964eb24fb19687f34d7665f778fcb6c5358fc0a5b81e1662cf90f73a2671c53f991");
+-- test123
  
 CREATE TABLE activities ( 
-  id_activitiy INTEGER PRIMARY KEY,
+  id_activity INTEGER PRIMARY KEY,
   id_act_category INTEGER, 
   id_course_module INTEGER, 
   day_week INTEGER, -- 0 to 4 (0=Monday, 1=Tuesday, 2=Wednesday,3=Thursday,4=Friday)
   act_starttime REAL, -- 9.0, 9.5, 10.0
   act_endtime REAL,
-  term INTEGER, 
+  term INTEGER,
+  week INTEGER ,
   posted_by INTEGER, 
   FOREIGN KEY(id_act_category) REFERENCES activity_categories(id_act_category),
   FOREIGN KEY(id_course_module) REFERENCES course_modules(id_course_module),
