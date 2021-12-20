@@ -40,9 +40,15 @@ fun main(args: Array<String>) {
     println("DATABASE LOCATION: " + dbConnector.dbFileLocation)
 
     val courseTypes = dbConnector.rawSelectWithModel("SELECT * FROM ${CourseTypeModel().tableName}", CourseTypeResultSetToModel())
-    
+    val courseTypesRaw = dbConnector.rawSelect("SELECT * FROM ${CourseTypeModel().tableName}")
     for (courseType in courseTypes) {
         println("Course Type: " + courseType.label);
+    }
+
+    for (courseType in courseTypesRaw) {
+        val id = courseType["id_course_type"]
+        val label = courseType["label"]
+        println("Course Type: ${label}" + courseType["label"] + courseType["id_course_type"]);
     }
 
 

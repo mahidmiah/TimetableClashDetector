@@ -127,21 +127,25 @@ class DBConnector(val dbFileLocation: String) {
      * https://stackoverflow.com/questions/7507121/efficient-way-to-handle-resultset-in-java
      * NEED TO IMPLEMENT
      */
-    fun rawSelect(query: String) : MutableMap<String, String>? {
+    fun rawSelect(query: String) : ArrayList<MutableMap<String, String>> {
+
+
         return this.startStatementEnvironment { conn ->
-            val row: MutableMap<String, String> = mutableMapOf()
-            var stmt: Statement = conn!!.createStatement()
+            val rowsList: ArrayList<MutableMap<String, String>> = arrayListOf();
+            val stmt: Statement = conn!!.createStatement()
             val rs: ResultSet = stmt.executeQuery(query)
             val md = rs.metaData
             val columns: Int = md.getColumnCount()
             while (rs.next()) {
+                val row: MutableMap<String, String> = mutableMapOf()
                 for (i in 1..columns) {
                     //println("" + i + md.getColumnName(i) + rs.getObject(i).toString())
                     row[md.getColumnName(i)] = rs.getObject(i).toString()
                 }
+                rowsList.add(row);
             }
 
-            return@startStatementEnvironment row;
+            return@startStatementEnvironment rowsList;
         }
 
 
