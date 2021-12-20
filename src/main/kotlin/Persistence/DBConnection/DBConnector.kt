@@ -125,6 +125,7 @@ class DBConnector(val dbFileLocation: String) {
 
     /**
      * https://stackoverflow.com/questions/7507121/efficient-way-to-handle-resultset-in-java
+     * NEED TO IMPLEMENT
      */
     fun rawSelect(query: String) : MutableMap<String, String>? {
         return this.startStatementEnvironment { conn ->
