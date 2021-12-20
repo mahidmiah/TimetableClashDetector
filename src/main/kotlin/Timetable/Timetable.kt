@@ -78,10 +78,10 @@ class Timetable (ID: Int? = null, Name: String, StartYear: Int, EndYear: Int, Un
             }
         }
         else{
-            val existingActivities = this.table[Year]?.terms?.get(Term)?.weeks?.get(Week)?.days?.get(DayOfWeek)?.TimeSlot?.get(StartTime)
-            existingActivities?.add(activity)
             var x = 0.0
             while (x < Duration + 0.5){
+                val existingActivities = this.table[Year]?.terms?.get(Term)?.weeks?.get(Week)?.days?.get(DayOfWeek)?.TimeSlot?.get(StartTime + x)
+                existingActivities?.add(activity)
                 this.table[Year]?.terms?.get(Term)?.weeks?.get(Week)?.days?.get(DayOfWeek)?.TimeSlot?.set(StartTime + x, existingActivities)
                 x += 0.5
             }

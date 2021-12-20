@@ -1,6 +1,7 @@
 package GUI;
 
 import ClashDetectionKotlin.KotlinDetector;
+import ClashDetectionScala.ScalaDetector;
 import Timetable.Timetable;
 import Timetable.Week;
 import Timetable.Day;
@@ -412,9 +413,12 @@ public class MainScreen extends JFrame{
         }
         this.timeTable.setModel(this.TableModel);
 
-        KotlinDetector detector = new KotlinDetector(Timetable);
+        ScalaDetector scalaDetector = new ScalaDetector(Timetable);
+        scalaDetector.detect();
+
+        KotlinDetector kotlinDetector = new KotlinDetector(Timetable);
         MultiLineCellRenderer renderer = new MultiLineCellRenderer();
-        renderer.clashDetectionInitiate(detector.detect(), Year, Term, Week);
+        renderer.clashDetectionInitiate(kotlinDetector.detect(), Year, Term, Week);
 
         this.timeTable.setDefaultRenderer(Object.class, renderer);
         this.timeTable.getColumnModel().getColumn(0).setPreferredWidth(2);
