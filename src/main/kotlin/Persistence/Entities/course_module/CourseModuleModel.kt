@@ -12,6 +12,6 @@ class CourseModuleModel(
     @field:Column(type = ColumnTypes.INTEGER) var is_optional: Int?,
     @field:Column(type = ColumnTypes.INTEGER) var available_year: Int?,
 
-): Model("course_modules") {
+): Model("course_modules", "id_course_module") {
 
 }

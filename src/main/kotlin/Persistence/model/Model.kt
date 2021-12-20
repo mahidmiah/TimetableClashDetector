@@ -8,6 +8,7 @@ import Persistence.annotations.Column
 import Persistence.annotations.ColumnTypes
 import java.lang.reflect.Field
 import java.sql.*
+import java.util.logging.Logger
 import kotlin.reflect.KMutableProperty
 import kotlin.reflect.full.memberProperties
 import kotlin.reflect.jvm.javaField
@@ -142,6 +143,8 @@ abstract class Model(val tableName: String, val primaryColumn: String? = null) {
 
         val columnDetails = ColumnDetails(field)
 
+        val logger = Logger.getLogger("Model::setStatementViaJavaField")
+
         val columnType = columnDetails.type
         field.setAccessible(true); // Needed to use the "get" method
 
@@ -161,9 +164,15 @@ abstract class Model(val tableName: String, val primaryColumn: String? = null) {
                     pstmt.setInt(statementIndex, field.get(this) as Int)
                 }
 
+            } else if (columnType == ColumnTypes.REAL) {
+                if (value == null)  {
+                    pstmt.setNull(statementIndex, Types.REAL)
+                } else {
+                    pstmt.setDouble(statementIndex, field.get(this) as Double)
+                }
             }
         } catch (e : Exception) {
-            println(e.message)
+            logger.warning(e.stackTraceToString())
         }
 
         field.setAccessible(false);
@@ -184,6 +193,8 @@ abstract class Model(val tableName: String, val primaryColumn: String? = null) {
 
     /**
      * Saves the content of the instance to the Database
+     * If the `Model.primaryColumn` is provided, then the save method
+     * will set a value to the according field/class attribute.
      */
     public fun save(dbConnector: DBConnector) : InsertResult{
 
