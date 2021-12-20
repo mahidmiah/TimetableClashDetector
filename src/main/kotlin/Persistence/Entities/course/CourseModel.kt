@@ -1,13 +1,11 @@
 package Persistence.Entities.course
 
 import Persistence.DBConnection.DBConnector
-import Persistence.annotations.CEntity
+import Persistence.Entities.course_type.CourseTypeModel
+import Persistence.Entities.course_type.CourseTypeResultSetToModel
 import Persistence.annotations.Column
 import Persistence.annotations.ColumnTypes
 import Persistence.model.Model
-import Persistence.model.SelectAll
-import java.sql.ResultSet
-import java.sql.Statement
 
 
 class CourseModel(
@@ -18,4 +16,15 @@ class CourseModel(
     @field:Column(type= ColumnTypes.INTEGER) var id_course_type: Int?= null,
 
 ): Model("courses", "id_course") {
+    fun fetchCourseType(dbConn: DBConnector) : CourseTypeModel? {
+        val courseTypes = dbConn.rawSelectWithModel("SELECT * FROM ${CourseTypeModel().tableName}\n" +
+                "WHERE id_course_type = ${this.id_course_type}",
+            CourseTypeResultSetToModel())
+
+        if (courseTypes.size > 0) {
+            return courseTypes[0];
+        }
+        return null;
+
+    }
 }

@@ -11,6 +11,7 @@ class ResultSetToActivity: ResultSetToModel<ActivityModel>() {
             id_act_category = rs.getInt("id_act_category"),
             act_starttime=rs.getDouble("act_starttime"),
             act_endtime = rs.getDouble("act_endtime"),
+            week=rs.getInt("week"),
             day_week = rs.getInt("day_week"),
             posted_by = rs.getInt("posted_by"),
             term = rs.getInt("term")

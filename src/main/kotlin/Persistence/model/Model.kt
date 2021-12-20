@@ -1,7 +1,5 @@
 package Persistence.model
 import Persistence.DBConnection.DBConnector
-import Persistence.Entities.course.CourseModel
-import Persistence.Entities.course.CourseResultSetToModel
 import Persistence.ResultSetToModel
 import Persistence.annotations.CEntity
 import Persistence.annotations.Column
@@ -39,7 +37,7 @@ import kotlin.reflect.jvm.javaField
  * Annotating the class with `@CEntity(pkField='id_course')`
  *
  */
-abstract class Model(val tableName: String, val primaryColumn: String? = null) {
+abstract class Model(val tableName: String, val primaryColumn: String) {
 
 
     companion object {
@@ -236,6 +234,15 @@ abstract class Model(val tableName: String, val primaryColumn: String? = null) {
             return@startStatementEnvironment InsertResult(affectedRows, generatedKeysList)
         }
 
+
+    }
+
+    fun <T : Model, PK> gFetchById(dbConn: DBConnector, id: PK, rsToModel: ResultSetToModel<T>) : T? {
+        val results = dbConn.rawSelectWithModel<T>("SELECT * FROM ${tableName} WHERE ${primaryColumn} = ${id.toString()}", rsToModel)
+        if (results.size > 0) {
+            return results[0]
+        }
+        return null;
 
     }
 

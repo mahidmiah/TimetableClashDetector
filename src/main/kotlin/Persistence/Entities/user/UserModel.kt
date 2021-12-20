@@ -11,6 +11,6 @@ class ModuleModel(
     @field:Column(type = ColumnTypes.TEXT) var last_name: String?,
     @field:Column(type = ColumnTypes.TEXT) var passw: String?,
 
-): Model("users") {
+): Model("users", "id_user") {
 
 }
