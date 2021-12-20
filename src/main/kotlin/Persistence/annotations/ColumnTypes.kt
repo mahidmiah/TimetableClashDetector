@@ -6,6 +6,7 @@ class ColumnTypes {
     companion object {
         const val INTEGER = Types.INTEGER
         const val TEXT = Types.VARCHAR
+        const val REAL = Types.REAL
 
     }
 }

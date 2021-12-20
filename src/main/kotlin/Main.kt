@@ -2,14 +2,11 @@ import GUI.MainScreen
 import Timetable.Timetable
 import Persistence.DBConnection.SingletonDBConnector
 import Persistence.DBCreator
-import Persistence.Entities.course.CourseModel
 import Persistence.Entities.course_type.CourseTypeModel
 import Persistence.Entities.course_type.CourseTypeResultSetToModel
-import Persistence.model.Model
-import Persistence.model.SelectAll
+import Persistence.seeds.compsci.MainCompSciSeed
+import Timetable.persistence.fetchTimetable.FetchCourseTimetable
 import java.security.AccessControlException
-import java.sql.ResultSet
-import java.sql.Statement
 import java.util.logging.Logger
 
 import kotlin.system.exitProcess
@@ -40,13 +37,21 @@ fun main(args: Array<String>) {
     println("DATABASE LOCATION: " + dbConnector.dbFileLocation)
 
     val courseTypes = dbConnector.rawSelectWithModel("SELECT * FROM ${CourseTypeModel().tableName}", CourseTypeResultSetToModel())
-    
+    val courseTypesRaw = dbConnector.rawSelect("SELECT * FROM ${CourseTypeModel().tableName}")
     for (courseType in courseTypes) {
         println("Course Type: " + courseType.label);
     }
 
+    for (courseType in courseTypesRaw) {
+        val id = courseType["id_course_type"]
+        val label = courseType["label"]
+        println("Course Type: ${label}" + courseType["label"] + courseType["id_course_type"]);
+    }
 
 
+    MainCompSciSeed().seed(dbConnector)
+
+    /* STATIC
     val timetable1 = Timetable(1, "BSc Computer Science", 2019, 2022, true)
 
 
@@ -60,6 +65,9 @@ fun main(args: Array<String>) {
 
     timetable1.addActivity(5, 1, 1, 2, 4, 1, 9.0, 1.0, 1)
 
+     */
+
+    val timetable1 = FetchCourseTimetable(dbConnector).fetchWithYear("BSc Computer Science", 2019)
     val mainScreen = MainScreen(timetable1)
     mainScreen.isVisible = true
 

@@ -1,12 +1,13 @@
 package Persistence.model
 import Persistence.DBConnection.DBConnector
-import Persistence.Entities.course.CourseModel
-import Persistence.Entities.course.CourseResultSetToModel
 import Persistence.ResultSetToModel
+import Persistence.annotations.CEntity
 import Persistence.annotations.Column
 import Persistence.annotations.ColumnTypes
 import java.lang.reflect.Field
 import java.sql.*
+import java.util.logging.Logger
+import kotlin.reflect.KMutableProperty
 import kotlin.reflect.full.memberProperties
 import kotlin.reflect.jvm.javaField
 
@@ -32,8 +33,11 @@ import kotlin.reflect.jvm.javaField
  *
  * `@field:Column(name="id_course_type", type=ColumnTypes.INTEGER) public val id_course_type: Int?`
  *
+ * You can denote the primary key by setting a value for `primaryColumn` OR
+ * Annotating the class with `@CEntity(pkField='id_course')`
+ *
  */
-abstract class Model(val tableName: String) {
+abstract class Model(val tableName: String, val primaryColumn: String) {
 
 
     companion object {
@@ -78,6 +82,36 @@ abstract class Model(val tableName: String) {
             return ArrayList(columnList2)
         }
 
+        private fun assignPrimaryKeyValueViaInstanceMetadata(model: Model, newId: Int) {
+
+            var truePrimaryColumn: String? = null
+            val entityAnnot = model::class.java.getAnnotation<CEntity>(CEntity::class.java)
+            if(entityAnnot != null) {
+                truePrimaryColumn = entityAnnot.pkColumn
+
+
+                //val field = this::class.java.getField(entityAnnot.PKField)
+                //field.set(this, insertedId)
+            } else if (model.primaryColumn != null) {
+                truePrimaryColumn = model.primaryColumn
+            }
+
+            if (truePrimaryColumn != null) {
+                val primaryField = model::class.memberProperties.find { e -> e.name == truePrimaryColumn}
+                if (primaryField != null) {
+                    // https://stackoverflow.com/questions/44304480/how-to-set-delegated-property-value-by-reflection-in-kotlin
+                    val primaryJavaField =primaryField.javaField
+                    if (primaryJavaField != null) {
+                        primaryJavaField.setAccessible(true); // Needed to use the "get" method
+                        if (primaryField is KMutableProperty<*>) {
+                            primaryField.setter.call(model, newId)
+                        }
+                        primaryJavaField.setAccessible(false); // Needed to use the "get" method
+                    }
+                }
+            }
+        }
+
         /**
          * Content of the Insert Query
          * @param query Generated query
@@ -107,6 +141,8 @@ abstract class Model(val tableName: String) {
 
         val columnDetails = ColumnDetails(field)
 
+        val logger = Logger.getLogger("Model::setStatementViaJavaField")
+
         val columnType = columnDetails.type
         field.setAccessible(true); // Needed to use the "get" method
 
@@ -126,9 +162,15 @@ abstract class Model(val tableName: String) {
                     pstmt.setInt(statementIndex, field.get(this) as Int)
                 }
 
+            } else if (columnType == ColumnTypes.REAL) {
+                if (value == null)  {
+                    pstmt.setNull(statementIndex, Types.REAL)
+                } else {
+                    pstmt.setDouble(statementIndex, field.get(this) as Double)
+                }
             }
         } catch (e : Exception) {
-            println(e.message)
+            logger.warning(e.stackTraceToString())
         }
 
         field.setAccessible(false);
@@ -149,11 +191,15 @@ abstract class Model(val tableName: String) {
 
     /**
      * Saves the content of the instance to the Database
+     * If the `Model.primaryColumn` is provided, then the save method
+     * will set a value to the according field/class attribute.
      */
     public fun save(dbConnector: DBConnector) : InsertResult{
+
+
         val insertQueryPrep = generateInsertQuery()
         val query = insertQueryPrep.query
-        println("QUERY INSERT" + query)
+        //println("QUERY INSERT" + query)
         return dbConnector.startStatementEnvironment<InsertResult> { conn ->
             val pstmt: PreparedStatement = conn.prepareStatement(query, Statement.RETURN_GENERATED_KEYS)
             var i = 0;
@@ -177,6 +223,10 @@ abstract class Model(val tableName: String) {
             if (rs.next()) {
                 val insertedId = rs.getInt(1)
                 generatedKeysList.add(insertedId)
+
+
+                Model.assignPrimaryKeyValueViaInstanceMetadata(this, insertedId)
+
             }
             rs.close();
 
@@ -184,6 +234,15 @@ abstract class Model(val tableName: String) {
             return@startStatementEnvironment InsertResult(affectedRows, generatedKeysList)
         }
 
+
+    }
+
+    fun <T : Model, PK> gFetchById(dbConn: DBConnector, id: PK, rsToModel: ResultSetToModel<T>) : T? {
+        val results = dbConn.rawSelectWithModel<T>("SELECT * FROM ${tableName} WHERE ${primaryColumn} = ${id.toString()}", rsToModel)
+        if (results.size > 0) {
+            return results[0]
+        }
+        return null;
 
     }
 

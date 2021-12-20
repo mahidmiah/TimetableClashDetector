@@ -8,8 +8,12 @@ import java.sql.ResultSet
 public class CourseTypeModel(
     @field:Column(type=ColumnTypes.INTEGER) public val id_course_type: Int? = null,
     @field:Column(type=ColumnTypes.TEXT) public val label: String? = null
-    ) : Model("course_types") {
+    ) : Model("course_types", "id_course_type") {
 
+    companion object {
+        const val UNDERGRADUATE="undergraduate";
+        const val POSTGRADUATE="postgraduate";
+    }
 
     /**
      * Just here for information sake
