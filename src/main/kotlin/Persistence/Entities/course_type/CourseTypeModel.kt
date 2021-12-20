@@ -6,14 +6,9 @@ import java.sql.Connection
 import java.sql.ResultSet
 
 public class CourseTypeModel(
-    @field:Column(type=ColumnTypes.INTEGER) public val id_course_type: Int?,
-    @field:Column(type=ColumnTypes.TEXT) public val label: String
+    @field:Column(type=ColumnTypes.INTEGER) public val id_course_type: Int? = null,
+    @field:Column(type=ColumnTypes.TEXT) public val label: String? = null
     ) : Model("course_types") {
-
-
-    constructor(rs: ResultSet) : this(
-        rs.getInt("id_course_type"),
-        rs.getString("label"))
 
 
     /**

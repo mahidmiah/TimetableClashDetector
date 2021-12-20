@@ -1,5 +1,8 @@
 package Persistence.model
 import Persistence.DBConnection.DBConnector
+import Persistence.Entities.course.CourseModel
+import Persistence.Entities.course.CourseResultSetToModel
+import Persistence.ResultSetToModel
 import Persistence.annotations.Column
 import Persistence.annotations.ColumnTypes
 import java.lang.reflect.Field
@@ -30,9 +33,13 @@ import kotlin.reflect.jvm.javaField
  * `@field:Column(name="id_course_type", type=ColumnTypes.INTEGER) public val id_course_type: Int?`
  *
  */
-open class Model(val tableName: String) {
-    companion object {
+abstract class Model(val tableName: String) {
 
+
+    companion object {
+        fun <T: Model> createFromResultSet(rs: ResultSet, rsToModel: ResultSetToModel<T>) : T {
+            return rsToModel.rsToModel(rs)
+        }
         /**
          * Returns a list of attributes that are used as Columns to map their equivalent Database columns.
          * Example:
@@ -179,4 +186,6 @@ open class Model(val tableName: String) {
 
 
     }
+
+
 }

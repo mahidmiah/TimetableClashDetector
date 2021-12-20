@@ -1,8 +1,9 @@
 package Persistence.DBConnection
+import Persistence.ResultSetToModel
+import Persistence.model.Model
 import java.io.File
-import java.sql.Connection
-import java.sql.DriverManager
-import java.sql.SQLException
+import java.sql.*
+
 
 /**
  * Class that handles connections to the database.
@@ -120,5 +121,36 @@ class DBConnector(val dbFileLocation: String) {
 
         }
         throw Exception("Could not execute statement due to missing connection.")
+    }
+
+    /**
+     * https://stackoverflow.com/questions/7507121/efficient-way-to-handle-resultset-in-java
+     */
+    fun rawSelect(query: String) : MutableMap<String, String>? {
+        return this.startStatementEnvironment { conn ->
+            val row: MutableMap<String, String> = mutableMapOf()
+            var stmt: Statement = conn!!.createStatement()
+            val rs: ResultSet = stmt.executeQuery(query)
+            val md = rs.metaData
+            val columns: Int = md.getColumnCount()
+            while (rs.next()) {
+                for (i in 1..columns) {
+                    //println("" + i + md.getColumnName(i) + rs.getObject(i).toString())
+                    row[md.getColumnName(i)] = rs.getObject(i).toString()
+                }
+            }
+
+            return@startStatementEnvironment row;
+        }
+
+
+    }
+    fun <T: Model> rawSelectWithModel(query: String, rsToModel: ResultSetToModel<T>) : ArrayList<T>{
+
+        return this.startStatementEnvironment { conn ->
+            val stmt: Statement = conn.createStatement()
+            val rs: ResultSet = stmt.executeQuery(query)
+            return@startStatementEnvironment rsToModel.rsListToModel(rs)
+        }
     }
 }
