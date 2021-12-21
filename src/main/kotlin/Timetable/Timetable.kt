@@ -68,24 +68,21 @@ class Timetable (ID: Int? = null, Name: String, StartYear: Int, EndYear: Int, Un
     }
 
     fun addActivity(ID: Int, Year: Int, Term: Int, Week: Int, DayOfWeek: Int, ModuleID: Int, StartTime: Double, Duration: Double, ActivityType: Int){
-        val activity = Activity(ID, ModuleID, this.modules.get(ModuleID)?.Name!!, StartTime, Duration, ActivityType, Year, Term, Week, DayOfWeek)
+        val activity = Activity(ID, ModuleID, this.modules[ModuleID]?.Name!!, StartTime, Duration, ActivityType, Year, Term, Week, DayOfWeek)
         this.Activities[ID] = activity
-        if (this.table[Year]?.terms?.get(Term)?.weeks?.get(Week)?.days?.get(DayOfWeek)?.TimeSlot?.get(StartTime) == null){
-            var x = 0.0
-            while (x < Duration + 0.5){
+        var x = 0.0
+        while (x < Duration + 0.5){
+            if (this.table[Year]?.terms?.get(Term)?.weeks?.get(Week)?.days?.get(DayOfWeek)?.TimeSlot?.get(StartTime + x) == null){
                 this.table[Year]?.terms?.get(Term)?.weeks?.get(Week)?.days?.get(DayOfWeek)?.TimeSlot?.set(StartTime + x, mutableListOf(activity))
-                x += 0.5
             }
-        }
-        else{
-            val existingActivities = this.table[Year]?.terms?.get(Term)?.weeks?.get(Week)?.days?.get(DayOfWeek)?.TimeSlot?.get(StartTime)
-            existingActivities?.add(activity)
-            var x = 0.0
-            while (x < Duration + 0.5){
+            else{
+                val existingActivities = this.table[Year]?.terms?.get(Term)?.weeks?.get(Week)?.days?.get(DayOfWeek)?.TimeSlot?.get(StartTime + x)
+                existingActivities?.add(activity)
                 this.table[Year]?.terms?.get(Term)?.weeks?.get(Week)?.days?.get(DayOfWeek)?.TimeSlot?.set(StartTime + x, existingActivities)
-                x += 0.5
             }
+            x += 0.5
         }
+
     }
 
     fun removeActivity(ID: Int){
