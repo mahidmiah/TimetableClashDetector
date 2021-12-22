@@ -37,7 +37,7 @@ class InstantiateDatabase {
 
         println("DATABASE LOCATION: " + dbConnector.dbFileLocation)
 
-        val courseTypes = dbConnector.rawSelectWithModel("SELECT * FROM ${CourseTypeModel().tableName}", CourseTypeResultSetToModel())
+        val courseTypes = dbConnector.rawSelectWithRsToModel("SELECT * FROM ${CourseTypeModel().tableName}", CourseTypeResultSetToModel())
         val courseTypesRaw = dbConnector.rawSelect("SELECT * FROM ${CourseTypeModel().tableName}")
         for (courseType in courseTypes) {
             println("Course Type: " + courseType.label);
