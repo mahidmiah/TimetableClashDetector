@@ -4,11 +4,8 @@ import Persistence.DBConnection.DBConnector
 import Persistence.Entities.activity.ActivityModel
 import Persistence.Entities.activity.ResultSetToActivity
 import Persistence.Entities.course.CourseModel
-import Persistence.Entities.course.ResultSetToCourse
 import Persistence.Entities.course_module.CourseModuleModel
 import Persistence.Entities.course_type.CourseTypeModel
-import Persistence.Entities.module.ModuleModel
-import Persistence.Entities.timetable.ResultSetToTimetable
 import Persistence.Entities.timetable.TimetableModel
 import Timetable.Timetable
 import java.util.logging.Logger
@@ -16,9 +13,9 @@ import java.util.logging.Logger
 class FetchCourseTimetable(val dbConnector: DBConnector) {
     fun fetchWithYear(courseName: String, startYear: Int) :  Timetable? {
         val logger = Logger.getLogger("fetchCourseTimetable")
-        val courses = dbConnector.rawSelectWithModel(
+        val courses = dbConnector.rawSelectResultSet(
             "SELECT * FROM ${CourseModel().tableName} WHERE name = '${courseName}' AND start_year = ${startYear};",
-            ResultSetToCourse()
+            {rs -> CourseModel().createArrayListFromResultSet(rs)}
         )
 
         if (courses.size == 0) {
@@ -28,10 +25,10 @@ class FetchCourseTimetable(val dbConnector: DBConnector) {
 
         val targetCourse = courses[0]
 
-        val timetableDocs = dbConnector.rawSelectWithModel("" +
+        val timetableDocs = dbConnector.rawSelectResultSet("" +
                 "SELECT * FROM ${TimetableModel().tableName}\n" +
                 "WHERE id_course = ${targetCourse.id_course}",
-        ResultSetToTimetable())
+            {rs -> TimetableModel().createArrayListFromResultSet(rs)})
 
         if (timetableDocs.size == 0) {
             logger.info("DID NOT FIND TIMETABLES WITH id_course=${targetCourse.id_course}")
@@ -39,7 +36,6 @@ class FetchCourseTimetable(val dbConnector: DBConnector) {
         }
 
         val targetTimetable = timetableDocs[0]
-        ActivityModel().id_course_module
 
         val activitiesQuery ="SELECT act.* FROM ${ActivityModel().tableName} as act\n" +
                 "INNER JOIN ${CourseModuleModel().tableName} as cm\n" +
@@ -47,13 +43,13 @@ class FetchCourseTimetable(val dbConnector: DBConnector) {
                 "WHERE cm.id_course = ${targetCourse.id_course}";
 
         println("ACT QUERY\n" + activitiesQuery)
-        val activities = dbConnector.rawSelectWithModel(activitiesQuery,
+        val activities = dbConnector.rawSelectWithRsToModel(activitiesQuery,
             ResultSetToActivity()
         )
 
         println("ACTS" + activities)
 
-        val courseType = targetCourse.fetchCourseType(dbConnector)
+        val courseType = targetCourse.fetchThisCourseType()
         var courseTypeBoolean = true;
         if (courseType != null) {
             courseTypeBoolean = (courseType.label == CourseTypeModel.UNDERGRADUATE)
@@ -66,10 +62,10 @@ class FetchCourseTimetable(val dbConnector: DBConnector) {
         val courseModulesInfoHashMap: MutableMap<Int, CourseModuleModel> = mutableMapOf<Int, CourseModuleModel>()
         for (act in activities) {
             println("Actibity: " + act.id_activity)
-            val courseModule = act.fetchCourseModule(dbConnector)
+            val courseModule = act.fetchThisCourseModule()
             if (courseModule != null) {
                 if (courseModulesInfoHashMap.containsKey(courseModule.id_course_module) == false) {
-                    val moduleDoc = courseModule.fetchModule(dbConnector)
+                    val moduleDoc = courseModule.fetchThisModule()
                     if (moduleDoc != null) {
                         timetable.addModule(courseModule.id_course_module!!, moduleDoc.name!!, courseModule.is_optional == 1)
                     } else {
