@@ -4,7 +4,9 @@ import Persistence.model.Model
 import java.io.File
 import java.sql.*
 
+interface IResultSetToArrayList {
 
+}
 /**
  * Class that handles connections to the database.
  */
@@ -125,7 +127,6 @@ class DBConnector(val dbFileLocation: String) {
 
     /**
      * https://stackoverflow.com/questions/7507121/efficient-way-to-handle-resultset-in-java
-     * NEED TO IMPLEMENT
      */
     fun rawSelect(query: String) : ArrayList<MutableMap<String, String>> {
 
@@ -144,18 +145,41 @@ class DBConnector(val dbFileLocation: String) {
                 }
                 rowsList.add(row);
             }
+            rs.close()
 
             return@startStatementEnvironment rowsList;
         }
 
 
     }
-    fun <T: Model> rawSelectWithModel(query: String, rsToModel: ResultSetToModel<T>) : ArrayList<T>{
+
+    fun <T> rawSelectResultSet(query: String, callback: (rs: ResultSet) -> T) : T{
+        return this.startStatementEnvironment { conn ->
+            val stmt: Statement = conn!!.createStatement()
+            val rs: ResultSet = stmt.executeQuery(query)
+            val result = callback(rs)
+            rs.close()
+            return@startStatementEnvironment result;
+        }
+    }
+
+    fun <TModel> rawSelectWithRsToModel(query: String, resultSetToModel: ResultSetToModel<TModel>): ArrayList<TModel> {
+        return this.startStatementEnvironment { conn ->
+            val stmt: Statement = conn!!.createStatement()
+            val rs: ResultSet = stmt.executeQuery(query)
+            val results = resultSetToModel.rsListToModel(rs)
+            rs.close()
+            return@startStatementEnvironment results;
+        }
+    }
+
+
+    fun <TModel, T: Model<TModel>> v2rawSelectWithModel(query: String, model: T) : ArrayList<T>{
 
         return this.startStatementEnvironment { conn ->
             val stmt: Statement = conn.createStatement()
             val rs: ResultSet = stmt.executeQuery(query)
-            return@startStatementEnvironment rsToModel.rsListToModel(rs)
+            return@startStatementEnvironment model.createArrayListFromResultSet(rs) as ArrayList<T>
         }
     }
 }

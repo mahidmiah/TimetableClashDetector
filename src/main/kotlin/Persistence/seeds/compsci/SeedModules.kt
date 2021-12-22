@@ -10,19 +10,19 @@ class SeedModules {
         const val hciCode = "HCI";
     }
     fun seed(dbConn: DBConnector){
-        val modules = SelectAll<ModuleModel>(dbConn, ModuleModel(), ResultSetToModule()).select()
+        val modules = ModuleModel().selectAll()
 
         var jvm = modules.find { m -> m.code == jvmCode }
         var hci = modules.find { m -> m.code == hciCode }
 
         if (jvm == null) {
             jvm = ModuleModel(null, jvmCode, jvmCode)
-            val insertRes = ModuleModel(null, jvmCode, jvmCode).save(dbConn)
+            val insertRes = ModuleModel(null, jvmCode, jvmCode).connSave(dbConn)
             jvm.id_module = insertRes.generatedKeys[0];
         }
         if (hci == null) {
             hci = ModuleModel(null, hciCode, hciCode)
-            val insertRes = hci.save(dbConn)
+            val insertRes = hci.connSave(dbConn)
             hci.id_module = insertRes.generatedKeys[0];
         }
 

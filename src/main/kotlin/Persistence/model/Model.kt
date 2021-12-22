@@ -37,13 +37,10 @@ import kotlin.reflect.jvm.javaField
  * Annotating the class with `@CEntity(pkField='id_course')`
  *
  */
-abstract class Model(val tableName: String, val primaryColumn: String) {
+abstract class Model<TModel>(val tableName: String, val primaryColumn: String) {
 
 
     companion object {
-        fun <T: Model> createFromResultSet(rs: ResultSet, rsToModel: ResultSetToModel<T>) : T {
-            return rsToModel.rsToModel(rs)
-        }
         /**
          * Returns a list of attributes that are used as Columns to map their equivalent Database columns.
          * Example:
@@ -52,7 +49,7 @@ abstract class Model(val tableName: String, val primaryColumn: String) {
          *
          * `@field:Column(name="id_course_type", type=ColumnVars.INTEGER) public val id_course_type: Int?`
          */
-        fun getListOfColumns(model: Model) : ArrayList<ColumnDetailsJavaField>{ // ArrayList<KProperty1<out Model, *>>
+        fun getListOfColumns(model: Model<Any>) : ArrayList<ColumnDetailsJavaField>{ // ArrayList<KProperty1<out Model, *>>
             val columnList: ArrayList<ColumnDetailsJavaField> = arrayListOf();
 
             // Iterate though the list of instance members(attributes, methods, e.t.c)
@@ -82,7 +79,7 @@ abstract class Model(val tableName: String, val primaryColumn: String) {
             return ArrayList(columnList2)
         }
 
-        private fun assignPrimaryKeyValueViaInstanceMetadata(model: Model, newId: Int) {
+        private fun assignPrimaryKeyValueViaInstanceMetadata(model: Model<Any>, newId: Int) {
 
             var truePrimaryColumn: String? = null
             val entityAnnot = model::class.java.getAnnotation<CEntity>(CEntity::class.java)
@@ -180,7 +177,7 @@ abstract class Model(val tableName: String, val primaryColumn: String) {
      * Generate INSERT SQL statement based on instance attributes properties.
      */
     private fun generateInsertQuery() : InsertQueryPreparation {
-        val columns = getListOfColumns(this);
+        val columns = getListOfColumns(this as Model<Any>);
         val questionMarks = columns.map { _ -> "?" }.joinToString(",")
         val columnOrder = columns.map{c -> c.name }.joinToString(",")
 
@@ -189,12 +186,39 @@ abstract class Model(val tableName: String, val primaryColumn: String) {
     }
 
 
+    open fun getDbConnector(): DBConnector {
+        throw Exception("Not implemented")
+    }
+    open fun createFromResultSet(rs: ResultSet) : TModel {
+        throw Exception("Not implemented")
+    }
+
+    fun createArrayListFromResultSet(rs: ResultSet) : ArrayList<TModel>{
+        val arrayList: ArrayList<TModel> = arrayListOf()
+        while(rs.next()){
+            arrayList.add(this.createFromResultSet(rs))
+        }
+        return arrayList
+
+    }
+
+
     /**
      * Saves the content of the instance to the Database
      * If the `Model.primaryColumn` is provided, then the save method
      * will set a value to the according field/class attribute.
      */
-    public fun save(dbConnector: DBConnector) : InsertResult{
+    fun save() : InsertResult {
+        return this.connSave(this.getDbConnector())
+    }
+
+
+    /**
+     * Saves the content of the instance to the Database
+     * If the `Model.primaryColumn` is provided, then the save method
+     * will set a value to the according field/class attribute.
+     */
+    public fun connSave(dbConnector: DBConnector) : InsertResult{
 
 
         val insertQueryPrep = generateInsertQuery()
@@ -225,7 +249,7 @@ abstract class Model(val tableName: String, val primaryColumn: String) {
                 generatedKeysList.add(insertedId)
 
 
-                Model.assignPrimaryKeyValueViaInstanceMetadata(this, insertedId)
+                Model.assignPrimaryKeyValueViaInstanceMetadata(this as Model<Any>, insertedId)
 
             }
             rs.close();
@@ -237,7 +261,26 @@ abstract class Model(val tableName: String, val primaryColumn: String) {
 
     }
 
-    fun <T : Model, PK> gFetchById(dbConn: DBConnector, id: PK, rsToModel: ResultSetToModel<T>) : T? {
+    fun <PK> selectById(id: PK) : TModel? {
+        val dbConnector = this.getDbConnector()
+        val results = dbConnector.rawSelectResultSet("SELECT * FROM ${this.tableName} WHERE ${this.primaryColumn} = ${id.toString()}") { rs ->
+            this.createArrayListFromResultSet(rs)
+        }
+        if (results.size > 0) {
+            return results[0]
+        }
+        return null;
+    }
+
+    fun selectAll() : ArrayList<TModel> {
+        val dbConnector = this.getDbConnector()
+        val results = dbConnector.rawSelectResultSet("SELECT * FROM ${this.tableName}", { rs ->
+            this.createArrayListFromResultSet(rs)
+        })
+        return results
+    }
+    /*
+    fun <T : TModel, PK> gFetchById(dbConn: DBConnector, id: PK, rsToModel: ResultSetToModel<T>) : T? {
         val results = dbConn.rawSelectWithModel<T>("SELECT * FROM ${tableName} WHERE ${primaryColumn} = ${id.toString()}", rsToModel)
         if (results.size > 0) {
             return results[0]
@@ -245,6 +288,8 @@ abstract class Model(val tableName: String, val primaryColumn: String) {
         return null;
 
     }
+    */
+
 
 
 }
