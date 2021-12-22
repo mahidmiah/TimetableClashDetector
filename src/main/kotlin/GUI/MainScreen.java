@@ -413,8 +413,8 @@ public class MainScreen extends JFrame{
         }
         this.timeTable.setModel(this.TableModel);
 
-//        ScalaDetector scalaDetector = new ScalaDetector(Timetable);
-//        scalaDetector.detect();
+        ScalaDetector scalaDetector = new ScalaDetector(Timetable);
+        scalaDetector.detect();
 
         KotlinDetector kotlinDetector = new KotlinDetector(Timetable);
         MultiLineCellRenderer renderer = new MultiLineCellRenderer();
