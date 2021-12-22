@@ -2,23 +2,17 @@ package Persistence.seeds.compsci
 
 import Persistence.DBConnection.DBConnector
 import Persistence.Entities.activity.ActivityModel
-import Persistence.Entities.activity.ResultSetToActivity
 import Persistence.Entities.activity_category.ActivityCategoryModel
-import Persistence.Entities.activity_category.ResultSetToActivityCategory
 import Persistence.Entities.course_type.CourseTypeModel
-import Persistence.Entities.course_type.CourseTypeResultSetToModel
 import Persistence.Entities.course.CourseModel
 import Persistence.Entities.course_module.CourseModuleModel
 import Persistence.Entities.module.ModuleModel
-import Persistence.Entities.module.ResultSetToModule
 import Persistence.Entities.timetable.TimetableModel
-
-import Persistence.model.SelectAll
 
 class MainCompSciSeed() {
 
     fun seed(dbConn: DBConnector){
-        val courseTypes = SelectAll(dbConn, CourseTypeModel(), CourseTypeResultSetToModel()).select()
+        val courseTypes = CourseTypeModel().selectAll()
         val undergraduateDoc = courseTypes.find { c -> c.label == CourseTypeModel.UNDERGRADUATE }
             ?: throw Exception("Could not find course type '${CourseTypeModel.UNDERGRADUATE}'")
 
@@ -30,12 +24,12 @@ class MainCompSciSeed() {
             id_course_type = undergraduateDoc.id_course_type
         )
         println("BEFORE SAVE: " + courseCompSci.id_course)
-        val insertedCourse = courseCompSci.save(dbConn)
+        val insertedCourse = courseCompSci.save()
         println("AFTER SAVE: " + courseCompSci.id_course)
         courseCompSci.id_course = insertedCourse.generatedKeys[0]
         SeedModules().seed(dbConn)
 
-        val modules = SelectAll(dbConn, ModuleModel(), ResultSetToModule()).select()
+        val modules = ModuleModel().selectAll()
         var jvmModule = modules.find { c -> c.code == SeedModules.jvmCode}
         var hciModule = modules.find { c -> c.code == SeedModules.hciCode}
         if (jvmModule == null || hciModule == null) {
@@ -49,7 +43,7 @@ class MainCompSciSeed() {
             is_optional = 1,
             available_year = 1,
         )
-        jvmCourseModule.save(dbConn)
+        jvmCourseModule.save()
 
         val hciCourseModule = CourseModuleModel(
             id_course_module = null,
@@ -58,14 +52,14 @@ class MainCompSciSeed() {
             is_optional = 1,
             available_year = 1,
         )
-        hciCourseModule.save(dbConn)
+        hciCourseModule.save()
 
         val compSciModules: ArrayList<Int> = arrayListOf(jvmCourseModule.id_module!!, hciCourseModule.id_module!!)
 
         val timetable = TimetableModel(null, courseCompSci.id_course)
-        timetable.save(dbConn)
+        timetable.save()
 
-        val activities = SelectAll(dbConn, ActivityModel(), ResultSetToActivity()).select()
+        val activities = ActivityModel().selectAll()
         val activitiesIds = activities.filter { a -> compSciModules.contains(a.id_course_module) }.map { a -> a.id_activity}
         val activitiesIdsJoin = activitiesIds.joinToString(",")
         if (activitiesIds.size > 0) {
@@ -85,8 +79,8 @@ class MainCompSciSeed() {
 
 
 
-        val tutorialType = ActivityCategoryModel().gFetchByLabel(dbConn, ActivityCategoryModel.tutorial)
-        val lectureType = ActivityCategoryModel().gFetchByLabel(dbConn, ActivityCategoryModel.lecture)
+        val tutorialType = ActivityCategoryModel().fetchByLabel(ActivityCategoryModel.tutorial)
+        val lectureType = ActivityCategoryModel().fetchByLabel(ActivityCategoryModel.lecture)
 
         if (tutorialType == null || lectureType == null) {
             throw Exception("Activity Categories not found")
@@ -164,7 +158,7 @@ class MainCompSciSeed() {
 
 
         for (act in newActivities) {
-            act.save(dbConn)
+            act.save()
         }
 
 

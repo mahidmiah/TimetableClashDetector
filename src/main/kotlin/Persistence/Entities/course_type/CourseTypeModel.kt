@@ -1,19 +1,27 @@
 package Persistence.Entities.course_type;
+import Persistence.Entities.course_module.CourseModuleModel
+import Persistence.Entities.course_module.ResultSetToCourseModule
 import Persistence.model.Model
 import Persistence.annotations.Column
 import Persistence.annotations.ColumnTypes
+import Persistence.model.ModelSQLite
 import java.sql.Connection
 import java.sql.ResultSet
 
 public class CourseTypeModel(
     @field:Column(type=ColumnTypes.INTEGER) public val id_course_type: Int? = null,
     @field:Column(type=ColumnTypes.TEXT) public val label: String? = null
-    ) : Model("course_types", "id_course_type") {
+    ) : ModelSQLite<CourseTypeModel>("course_types", "id_course_type") {
 
     companion object {
         const val UNDERGRADUATE="undergraduate";
         const val POSTGRADUATE="postgraduate";
     }
+
+    override fun createFromResultSet(rs: ResultSet): CourseTypeModel {
+        return CourseTypeResultSetToModel().rsToModel(rs)
+    }
+
 
     /**
      * Just here for information sake

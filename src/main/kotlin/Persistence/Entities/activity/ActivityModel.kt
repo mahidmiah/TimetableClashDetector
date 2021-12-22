@@ -6,6 +6,8 @@ import Persistence.Entities.course_module.ResultSetToCourseModule
 import Persistence.annotations.Column
 import Persistence.annotations.ColumnTypes
 import Persistence.model.Model
+import Persistence.model.ModelSQLite
+import java.sql.ResultSet
 
 class ActivityModel(
     @field:Column(type = ColumnTypes.INTEGER) var id_activity: Int? = null,
@@ -18,18 +20,14 @@ class ActivityModel(
     @field:Column(type = ColumnTypes.INTEGER) var term: Int? = null,
     @field:Column(type = ColumnTypes.INTEGER) var week: Int? = null,
 
-    ): Model("activities", "id_activity") {
+    ): ModelSQLite<ActivityModel>("activities", "id_activity") {
 
-        fun fetchCourseModule(dbConn: DBConnector) : CourseModuleModel?{
-            val results = dbConn.rawSelectWithModel("SELECT * FROM ${CourseModuleModel().tableName}\n" +
-                    "WHERE ${CourseModuleModel().primaryColumn} = ${this.id_course_module}",
-                ResultSetToCourseModule()
-            )
-
-            if (results.size > 0) {
-                return results[0];
-            }
-            return null;
+        fun fetchThisCourseModule() : CourseModuleModel?{
+            return CourseModuleModel().selectById(this.id_course_module)
         }
+
+    override fun createFromResultSet(rs: ResultSet): ActivityModel {
+        return ResultSetToActivity().rsToModel(rs)
+    }
 
 }
