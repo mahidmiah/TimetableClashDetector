@@ -37,7 +37,7 @@ CREATE TABLE activity_categories (
 ); 
  
 INSERT INTO activity_categories (label) 
-VALUES ('lecture'), ('tutorial'); 
+VALUES ('Lecture'), ('Tutorial'), ('Exam'), ('Lab');
  
 CREATE TABLE course_modules ( 
   id_course_module INTEGER PRIMARY KEY,
