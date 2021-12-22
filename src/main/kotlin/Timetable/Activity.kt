@@ -33,12 +33,18 @@ class Activity(ID: Int, ModuleID: Int, ModuleName: String, StartTime: Double, Du
         this.defineLessonTypesViaDB()
     }
 
+    /**
+     * Sets `lessonTypes` based on the activity categories' records in the database table.
+     */
     fun defineLessonTypesViaDB(){
 
-        val docs = ActivityCategoryModel().selectAll()
+        val records = ActivityCategoryModel().selectAll()
 
         val map: MutableMap<Int, String> = mutableMapOf()
-        docs.map { e -> map.put(e.id_act_category!!, e.label!!) }
+
+        for (doc in records) {
+            map[doc.id_act_category!!] = doc.label!!
+        }
         this.lessonTypes = map;
         //println("SET LESSON TYPES: " + this.lessonTypes)
 

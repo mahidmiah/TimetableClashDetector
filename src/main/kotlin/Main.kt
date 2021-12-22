@@ -55,9 +55,9 @@ class InstantiateDatabase {
 }
 fun main(args: Array<String>) {
 
-    //InstantiateDatabase().run()
-
-    val timetable1 = Timetable(1, "BSc Computer Science", 2019, 2022, true)
+    InstantiateDatabase().run()
+    /*
+    var timetable1 = Timetable(1, "BSc Computer Science", 2019, 2022, true)
 
 
     timetable1.addModule(1, "JVM", true)
@@ -69,10 +69,11 @@ fun main(args: Array<String>) {
     timetable1.addActivity(4, 1, 1, 1, 2, 1, 9.0, 1.0, 2)
 
     timetable1.addActivity(5, 1, 1, 2, 4, 1, 9.0, 1.0, 1)
+    */
 
+    val dbConnector = SingletonDBConnector.getConnector()
+    val timetable1 = FetchCourseTimetable(dbConnector).fetchWithYear("BSc Computer Science", 2019)!!
 
-
-    //val timetable1 = FetchCourseTimetable(dbConnector).fetchWithYear("BSc Computer Science", 2019)
     val mainScreen = MainScreen(timetable1)
     mainScreen.isVisible = true
 

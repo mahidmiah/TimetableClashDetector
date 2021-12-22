@@ -2,6 +2,7 @@ package GUI;
 
 import ClashDetectionKotlin.KotlinDetector;
 import ClashDetectionScala.ScalaDetector;
+import Persistence.Entities.activity_category.ActivityCategoryModel;
 import Timetable.Timetable;
 import Timetable.Week;
 import Timetable.Day;
@@ -306,7 +307,12 @@ public class MainScreen extends JFrame{
                 panel.add(activityDurationComboBox);
 
                 panel.add(activityTypeLabel);
-                String types[] = { "Lecture", "Lab", "Tutorial"};
+
+                ArrayList<ActivityCategoryModel> results = new ActivityCategoryModel().selectAll();
+                List typesList = new ActivityCategoryModel().labelsToArray(results);
+
+                String[] types = (String[]) typesList.toArray(new String[typesList.size()]);
+
                 JComboBox activityTypeComboBox = new JComboBox(types);
                 panel.add(activityTypeComboBox);
 
@@ -314,7 +320,15 @@ public class MainScreen extends JFrame{
 
                 if (!activityIDTextField.getText().isEmpty()){
                     if(!timetable.getActivities().containsKey(Integer.parseInt(activityIDTextField.getText()))){
-                        timetable.addActivity(Integer.parseInt(activityIDTextField.getText()), (Integer) activityYearComboBox.getSelectedItem(), (Integer) activityTermComboBox.getSelectedItem(), (Integer) activityWeekComboBox.getSelectedItem(), activityDayComboBox.getSelectedIndex(), (Integer) moduleIDComboBox.getSelectedItem(), (Double) activityStartTimeComboBox.getSelectedItem(),  (Double) activityDurationComboBox.getSelectedItem(), activityTypeComboBox.getSelectedIndex());
+                        timetable.addActivity(Integer.parseInt(activityIDTextField.getText()),
+                                (Integer) activityYearComboBox.getSelectedItem(),
+                                (Integer) activityTermComboBox.getSelectedItem(),
+                                (Integer) activityWeekComboBox.getSelectedItem(),
+                                activityDayComboBox.getSelectedIndex(),
+                                (Integer) moduleIDComboBox.getSelectedItem(),
+                                (Double) activityStartTimeComboBox.getSelectedItem(),
+                                (Double) activityDurationComboBox.getSelectedItem(),
+                                activityTypeComboBox.getSelectedIndex() + 1);
                         update(Integer.parseInt(yearGroupRadioGroup.getSelection().getActionCommand()), Integer.parseInt(termGroupRadioGroup.getSelection().getActionCommand()), Integer.parseInt(weekGroupRadioGroup.getSelection().getActionCommand()), table);
                     }
                     else {

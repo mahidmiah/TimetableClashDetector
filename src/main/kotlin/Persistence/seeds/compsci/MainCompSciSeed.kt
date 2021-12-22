@@ -81,8 +81,10 @@ class MainCompSciSeed() {
 
         val tutorialType = ActivityCategoryModel().fetchByLabel(ActivityCategoryModel.tutorial)
         val lectureType = ActivityCategoryModel().fetchByLabel(ActivityCategoryModel.lecture)
+        val examType = ActivityCategoryModel().fetchByLabel(ActivityCategoryModel.exam)
+        val labType = ActivityCategoryModel().fetchByLabel(ActivityCategoryModel.lab)
 
-        if (tutorialType == null || lectureType == null) {
+        if (tutorialType == null || lectureType == null || examType == null || labType == null) {
             throw Exception("Activity Categories not found")
         }
         val newActivities: ArrayList<ActivityModel> = arrayListOf()
@@ -90,7 +92,7 @@ class MainCompSciSeed() {
         newActivities.add(
             ActivityModel(
             id_activity = null,
-                id_act_category = tutorialType.id_act_category,
+                id_act_category = lectureType.id_act_category,
                 id_course_module = jvmCourseModule.id_course_module,
                 posted_by = 1,
                 term = 1,
@@ -103,7 +105,7 @@ class MainCompSciSeed() {
         newActivities.add(
             ActivityModel(
                 id_activity = null,
-                id_act_category = tutorialType.id_act_category,
+                id_act_category = labType.id_act_category,
 
                 id_course_module = jvmCourseModule.id_course_module,
                 posted_by = 1,
@@ -117,14 +119,14 @@ class MainCompSciSeed() {
         newActivities.add(
             ActivityModel(
                 id_activity = null,
-                id_act_category = tutorialType.id_act_category,
+                id_act_category = examType.id_act_category,
                 id_course_module = hciCourseModule.id_course_module,
                 posted_by = 1,
                 week=1,
                 term = 1,
                 day_week = 0,
                 act_starttime = 9.0,
-                act_endtime = 11.0
+                act_endtime = 10.0,
             )
         )
         newActivities.add(
@@ -145,7 +147,7 @@ class MainCompSciSeed() {
         newActivities.add(
             ActivityModel(
                 id_activity = null,
-                id_act_category = tutorialType.id_act_category,
+                id_act_category = labType.id_act_category,
                 id_course_module = jvmCourseModule.id_course_module,
                 posted_by = 1,
                 term = 1,

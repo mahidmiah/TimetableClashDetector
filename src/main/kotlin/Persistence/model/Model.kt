@@ -141,7 +141,7 @@ abstract class Model<TModel>(val tableName: String, val primaryColumn: String) {
         val logger = Logger.getLogger("Model::setStatementViaJavaField")
 
         val columnType = columnDetails.type
-        field.setAccessible(true); // Needed to use the "get" method
+        field.setAccessible(true); // Needed to use the "get", "set" method
 
         try {
             val value = field.get(this)
@@ -185,10 +185,16 @@ abstract class Model<TModel>(val tableName: String, val primaryColumn: String) {
                 "VALUES(${questionMarks});", columns=columns) ;
     }
 
-
+    /**
+     * Method to obtain the DBConnector.
+     */
     open fun getDbConnector(): DBConnector {
         throw Exception("Not implemented")
     }
+
+    /**
+     * Method to convert ResultSet to a Model
+     */
     open fun createFromResultSet(rs: ResultSet) : TModel {
         throw Exception("Not implemented")
     }
@@ -261,6 +267,10 @@ abstract class Model<TModel>(val tableName: String, val primaryColumn: String) {
 
     }
 
+    /**
+     * Fetches the document via ID.
+     * The column that stores the ID is defined by the `primaryColumn`
+     */
     fun <PK> selectById(id: PK) : TModel? {
         val dbConnector = this.getDbConnector()
         val results = dbConnector.rawSelectResultSet("SELECT * FROM ${this.tableName} WHERE ${this.primaryColumn} = ${id.toString()}") { rs ->
@@ -272,6 +282,9 @@ abstract class Model<TModel>(val tableName: String, val primaryColumn: String) {
         return null;
     }
 
+    /**
+     * Fetches all records from the table
+     */
     fun selectAll() : ArrayList<TModel> {
         val dbConnector = this.getDbConnector()
         val results = dbConnector.rawSelectResultSet("SELECT * FROM ${this.tableName}", { rs ->
