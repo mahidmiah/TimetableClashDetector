@@ -64,9 +64,19 @@ class KotlinDetector(TimetableObj: Timetable) {
                         for (slot in day.value.TimeSlot){
                             slot.value?.let {
                                 if (it.size > 1){
+                                    var compulsory = false
                                     for (activity in it){
                                         //println("$it --- ${activity.ID}")
-                                        clashes.add(activity.ID)
+                                        //clashes.add(activity.ID)
+                                        if (this.Timetable.modules[activity.Module]?.IsOptional == false){
+                                            //clashes.add(activity.ID)
+                                            compulsory = true
+                                        }
+                                    }
+                                    if (compulsory){
+                                        for (activity in it){
+                                            clashes.add(activity.ID)
+                                        }
                                     }
                                 }
                             }
