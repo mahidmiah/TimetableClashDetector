@@ -22,6 +22,20 @@ public class CourseTypeModel(
         return CourseTypeResultSetToModel().rsToModel(rs)
     }
 
+    fun selectByLabel(qLabel: String) : ArrayList<CourseTypeModel>{
+        val dbConnector = this.getDbConnector()
+        val records = dbConnector.rawSelectResultSet("SELECT * FROM ${tableName} WHERE label = '${qLabel}'", {
+            rs -> this.createArrayListFromResultSet(rs)
+        })
+
+        return records;
+    }
+
+    fun selectOneByLabel(qLabel: String) : CourseTypeModel? {
+        val records = this.selectByLabel(qLabel);
+        return if (records.size > 0) records[0] else null;
+    }
+
 
     /**
      * Just here for information sake

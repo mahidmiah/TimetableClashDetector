@@ -9,6 +9,8 @@ import Timetable.Day;
 import Timetable.Activity;
 import Timetable.Module;
 import Utils.MultiLineCellRenderer;
+import use_cases.insert_course_module.InsertCourseModule;
+import use_cases.insert_course_module.InsertCourseModuleResult;
 
 import javax.swing.*;
 import javax.swing.JFrame;
@@ -158,8 +160,8 @@ public class MainScreen extends JFrame{
                 optionalChoiceGroup.add(trueRadioButton);
                 optionalChoiceGroup.add(falseRadioButton);
 
-                panel.add(moduleIDLabel);
-                panel.add(moduleIDTextField);
+                //panel.add(moduleIDLabel); Remove ModuleId
+                //panel.add(moduleIDTextField);
 
                 panel.add(moduleNameLabel);
                 panel.add(moduleNameTextField);
@@ -174,12 +176,14 @@ public class MainScreen extends JFrame{
 
                 JOptionPane.showMessageDialog(panelMain, panel);
 
-                if (!moduleIDTextField.getText().isEmpty() && !moduleNameTextField.getText().isEmpty() && optionalChoiceGroup.getSelection() != null){
-                    if(!timetable.getModules().containsKey(Integer.parseInt(moduleIDTextField.getText()))){
-                        table.addModule(Integer.parseInt(moduleIDTextField.getText()), moduleNameTextField.getText(), trueFalseDict.get(optionalChoiceGroup.getSelection().getActionCommand()));
+                // removed !moduleIDTextField.getText().isEmpty() &&
+                if (!moduleNameTextField.getText().isEmpty() && optionalChoiceGroup.getSelection() != null){
+                    if (timetable.getID() != null) {
+                        InsertCourseModuleResult res = new InsertCourseModule(timetable.getID(), moduleNameTextField.getText(), trueFalseDict.get(optionalChoiceGroup.getSelection().getActionCommand())).insert();
+                        //table.addModule(Integer.parseInt(moduleIDTextField.getText()), moduleNameTextField.getText(), trueFalseDict.get(optionalChoiceGroup.getSelection().getActionCommand()));
+                        table.addModule(res.getCourseModuleModel().getId_course_module(), moduleNameTextField.getText(), trueFalseDict.get(optionalChoiceGroup.getSelection().getActionCommand()));
                         updateModulesList(table);
-                    }
-                    else {
+                    } else {
                         JOptionPane.showMessageDialog(panelMain, "Module ID already exists!", "Module ID Error", JOptionPane.ERROR_MESSAGE);
                     }
                 }
