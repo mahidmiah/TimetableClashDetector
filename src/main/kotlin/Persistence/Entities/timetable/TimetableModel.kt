@@ -1,5 +1,6 @@
 package Persistence.Entities.timetable;
 
+import Persistence.Entities.course.CourseModel
 import Persistence.annotations.Column
 import Persistence.annotations.ColumnTypes
 import Persistence.model.Model
@@ -12,6 +13,10 @@ class TimetableModel(
 ): ModelSQLite<TimetableModel>("timetables", "id_timetable") {
     override fun createFromResultSet(rs: ResultSet): TimetableModel {
         return ResultSetToTimetable().rsToModel(rs)
+    }
+
+    fun fetchThisCourse() : CourseModel? {
+        return CourseModel().selectById(this.id_course);
     }
 
 }

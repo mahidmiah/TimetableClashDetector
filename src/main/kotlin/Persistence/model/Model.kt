@@ -1,6 +1,5 @@
 package Persistence.model
 import Persistence.DBConnection.DBConnector
-import Persistence.ResultSetToModel
 import Persistence.annotations.CEntity
 import Persistence.annotations.Column
 import Persistence.annotations.ColumnTypes
@@ -10,6 +9,8 @@ import java.util.logging.Logger
 import kotlin.reflect.KMutableProperty
 import kotlin.reflect.full.memberProperties
 import kotlin.reflect.jvm.javaField
+
+
 
 /**
  Resources about Reflections:
@@ -208,6 +209,21 @@ abstract class Model<TModel>(val tableName: String, val primaryColumn: String) {
 
     }
 
+    private val preSaveValidators : MutableMap<String, ModelValidator> = mutableMapOf()
+
+    fun addPreSaveValidators(validator: ModelValidator){
+        this.preSaveValidators.put(validator.id, validator);
+    }
+    fun removePreSaveValidator(validator: ModelValidator){
+        this.preSaveValidators.remove(validator.id)
+    }
+
+    private fun preSaveValidate(){
+        for (validator in this.preSaveValidators) {
+            validator.value.validate()
+        }
+    }
+
 
     /**
      * Saves the content of the instance to the Database
@@ -226,7 +242,7 @@ abstract class Model<TModel>(val tableName: String, val primaryColumn: String) {
      */
     public fun connSave(dbConnector: DBConnector) : InsertResult{
 
-
+        this.preSaveValidate()
         val insertQueryPrep = generateInsertQuery()
         val query = insertQueryPrep.query
         //println("QUERY INSERT" + query)
