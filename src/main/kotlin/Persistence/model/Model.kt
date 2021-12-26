@@ -126,6 +126,12 @@ abstract class Model<TModel>(val tableName: String, val primaryColumn: String) {
          */
         class InsertResult(val affectedRows: Int, val generatedKeys: ArrayList<Int>)
 
+        /**
+         * Result of the DELETE statement
+         * @param affectedRows Number of affected rows after delete
+         */
+        class DeleteResult(val affectedRows: Int)
+
 
     }
 
@@ -296,6 +302,29 @@ abstract class Model<TModel>(val tableName: String, val primaryColumn: String) {
             return results[0]
         }
         return null;
+    }
+
+    fun <PK> deleteById(targetId: PK) : DeleteResult {
+        val query = "DELETE FROM ${tableName} WHERE ${primaryColumn} = ?;";
+        val dbConnector = this.getDbConnector()
+        return dbConnector.startStatementEnvironment<DeleteResult> { conn ->
+            val pstmt: PreparedStatement = conn.prepareStatement(query);
+
+            if (targetId is Int) {
+                println("targetId is an INT")
+                pstmt.setInt(1, targetId)
+            } else {
+                pstmt.setString(1, targetId as String)
+            }
+
+            val affectedRows = pstmt.executeUpdate();
+            pstmt.close()
+
+            return@startStatementEnvironment DeleteResult(affectedRows)
+
+        }
+
+
     }
 
     /**

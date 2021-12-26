@@ -10,9 +10,10 @@ import Timetable.Day;
 import Timetable.Activity;
 import Timetable.Module;
 import Utils.MultiLineCellRenderer;
-import use_cases.insert_course_module.InsertCourseModule;
-import use_cases.insert_course_module.InsertCourseModuleResult;
-import use_cases.insert_course_module.UseCaseError;
+import use_cases.course_module.insert_course_module.InsertCourseModule;
+import use_cases.course_module.insert_course_module.InsertCourseModuleResult;
+import use_cases.course_module.insert_course_module.UseCaseError;
+import use_cases.course_module.remove_course_module.RemoveCourseModule;
 
 import javax.swing.*;
 import javax.swing.JFrame;
@@ -23,6 +24,7 @@ import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.util.*;
 import java.util.List;
+import java.util.logging.Logger;
 
 public class MainScreen extends JFrame{
     private DefaultTableModel TableModel;
@@ -56,6 +58,8 @@ public class MainScreen extends JFrame{
     private JLabel weekLabel;
     private JRadioButton Week2RadioButton;
     private JButton clashDetectionButton;
+
+    private Logger logger = Logger.getLogger("MainScreen");
 
     public MainScreen(Timetable timetable){
 
@@ -189,7 +193,8 @@ public class MainScreen extends JFrame{
                             table.addModule(courseModuleModel.getId_course_module(), moduleNameTextField.getText(), trueFalseDict.get(optionalChoiceGroup.getSelection().getActionCommand()));
                             updateModulesList(table);
                         } catch (UseCaseError insertError) {
-                            System.out.println("UseCaseError");
+                            logger.warning(insertError.getMessage());
+                            insertError.printStackTrace();
                             String messageToDisplay = insertError.getMessageToDisplay();
                             String title = insertError.getTitleToDisplay();
                             JOptionPane.showMessageDialog(panelMain, messageToDisplay, title, JOptionPane.ERROR_MESSAGE);
@@ -222,9 +227,24 @@ public class MainScreen extends JFrame{
                             JOptionPane.QUESTION_MESSAGE);
                     if(result == JOptionPane.YES_OPTION){
                         int moduleID = Integer.parseInt(String.valueOf(courseModuleJList.getSelectedValue().toString().charAt(4)));
-                        timetable.removeModule(moduleID);
-                        update(Integer.parseInt(yearGroupRadioGroup.getSelection().getActionCommand()), Integer.parseInt(termGroupRadioGroup.getSelection().getActionCommand()), Integer.parseInt(weekGroupRadioGroup.getSelection().getActionCommand()), table);
-                        JOptionPane.showMessageDialog(panelMain, "Module and all relevant activities have successfully been removed.", "Success", JOptionPane.PLAIN_MESSAGE);
+                        try {
+                            RemoveCourseModule removeCourseModule = new RemoveCourseModule();
+                            removeCourseModule.remove(moduleID);
+
+                            timetable.removeModule(moduleID);
+                            update(Integer.parseInt(yearGroupRadioGroup.getSelection().getActionCommand()), Integer.parseInt(termGroupRadioGroup.getSelection().getActionCommand()), Integer.parseInt(weekGroupRadioGroup.getSelection().getActionCommand()), table);
+                            JOptionPane.showMessageDialog(panelMain, "Module and all relevant activities have successfully been removed.", "Success", JOptionPane.PLAIN_MESSAGE);
+
+
+                        } catch (UseCaseError removeError) {
+
+                            removeError.printStackTrace();
+                            logger.warning(removeError.getMessage());
+
+                            String message = removeError.getMessageToDisplay();
+                            JOptionPane.showMessageDialog(panelMain, message, "Remove Module Error", JOptionPane.ERROR_MESSAGE);
+                        }
+
 
                     }
                     else if (result == JOptionPane.NO_OPTION){
