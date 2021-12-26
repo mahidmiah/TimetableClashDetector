@@ -6,28 +6,32 @@ import Persistence.Entities.course_type.CourseTypeModel
 import Persistence.Entities.module.ModuleModel
 import Persistence.Entities.timetable.TimetableModel
 import Timetable.Timetable
+import kotlin.jvm.Throws
 
 
-class ExistentModule(model: ModuleModel) :
-    Exception("There is already a model with the name: ${model.code}") {}
-
-class CourseNotFound(message: String) :
-    Exception(message) {}
-class TimetableNotFound(message: String) :
-    Exception(message) {}
+class ExistentModule(val model: ModuleModel) :
+    UseCaseError("ExistentModule",
+        "There is already a module with the name: ${model.code}",
+        "Existent Module") {}
 
 
 class InsertCourseModuleResult(val module: ModuleModel, val courseModuleModel: CourseModuleModel)
 class InsertCourseModule(val timetableId: Int, val name: String, val isOptional: Boolean) {
+    @Throws(UseCaseError::class)
     fun insert() : InsertCourseModuleResult  {
 
         val timetableModel = TimetableModel().selectById(timetableId)
         if (timetableModel == null) {
-            throw TimetableNotFound("Timetable not found. Tried ID: " + timetableId)
+            throw UseCaseError("TimetableNotFound",
+                "Timetable not found. Tried ID: " + timetableId,
+            "Timetable not found")
         }
         val course = timetableModel.fetchThisCourse()
         if (course == null){
-            throw CourseNotFound("Course not found. Tried ID: " + timetableModel.id_course)
+
+            throw UseCaseError("CourseNotFound",
+                "Course not found. Tried ID: " + timetableModel.id_course,
+                "course not found")
         }
 
         val newModule = ModuleModel()

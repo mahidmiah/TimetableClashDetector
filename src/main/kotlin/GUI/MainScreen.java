@@ -3,6 +3,7 @@ package GUI;
 import ClashDetectionKotlin.KotlinDetector;
 import ClashDetectionScala.ScalaDetector;
 import Persistence.Entities.activity_category.ActivityCategoryModel;
+import Persistence.Entities.course_module.CourseModuleModel;
 import Timetable.Timetable;
 import Timetable.Week;
 import Timetable.Day;
@@ -11,6 +12,7 @@ import Timetable.Module;
 import Utils.MultiLineCellRenderer;
 import use_cases.insert_course_module.InsertCourseModule;
 import use_cases.insert_course_module.InsertCourseModuleResult;
+import use_cases.insert_course_module.UseCaseError;
 
 import javax.swing.*;
 import javax.swing.JFrame;
@@ -179,10 +181,21 @@ public class MainScreen extends JFrame{
                 // removed !moduleIDTextField.getText().isEmpty() &&
                 if (!moduleNameTextField.getText().isEmpty() && optionalChoiceGroup.getSelection() != null){
                     if (timetable.getID() != null) {
-                        InsertCourseModuleResult res = new InsertCourseModule(timetable.getID(), moduleNameTextField.getText(), trueFalseDict.get(optionalChoiceGroup.getSelection().getActionCommand())).insert();
-                        //table.addModule(Integer.parseInt(moduleIDTextField.getText()), moduleNameTextField.getText(), trueFalseDict.get(optionalChoiceGroup.getSelection().getActionCommand()));
-                        table.addModule(res.getCourseModuleModel().getId_course_module(), moduleNameTextField.getText(), trueFalseDict.get(optionalChoiceGroup.getSelection().getActionCommand()));
-                        updateModulesList(table);
+                        try {
+                            InsertCourseModule icm = new InsertCourseModule(timetable.getID(), moduleNameTextField.getText(), trueFalseDict.get(optionalChoiceGroup.getSelection().getActionCommand()));
+                            InsertCourseModuleResult res = icm.insert();
+                            //table.addModule(Integer.parseInt(moduleIDTextField.getText()), moduleNameTextField.getText(), trueFalseDict.get(optionalChoiceGroup.getSelection().getActionCommand()));
+                            CourseModuleModel courseModuleModel = res.getCourseModuleModel();
+                            table.addModule(courseModuleModel.getId_course_module(), moduleNameTextField.getText(), trueFalseDict.get(optionalChoiceGroup.getSelection().getActionCommand()));
+                            updateModulesList(table);
+                        } catch (UseCaseError insertError) {
+                            System.out.println("UseCaseError");
+                            String messageToDisplay = insertError.getMessageToDisplay();
+                            String title = insertError.getTitleToDisplay();
+                            JOptionPane.showMessageDialog(panelMain, messageToDisplay, title, JOptionPane.ERROR_MESSAGE);
+                        }
+
+
                     } else {
                         JOptionPane.showMessageDialog(panelMain, "Module ID already exists!", "Module ID Error", JOptionPane.ERROR_MESSAGE);
                     }
