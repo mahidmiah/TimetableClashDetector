@@ -60,7 +60,7 @@ fun main(args: Array<String>) {
     var timetable1 = Timetable(1, "BSc Computer Science", 2019, 2022, true)
 
 
-    timetable1.addModule(1, "JVM", true)
+    timetable1.addModule(1, "JVM", false)
     timetable1.addModule(2, "HCI", true)
 
     timetable1.addActivity(1, 1, 1, 1, 0, 1, 9.0, 2.0, 0)
