@@ -2,6 +2,7 @@ package GUI;
 
 import ClashDetectionKotlin.KotlinDetector;
 import ClashDetectionScala.ScalaDetector;
+import Persistence.Entities.activity.ActivityModel;
 import Persistence.Entities.activity_category.ActivityCategoryModel;
 import Persistence.Entities.course_module.CourseModuleModel;
 import Timetable.Timetable;
@@ -10,6 +11,8 @@ import Timetable.Day;
 import Timetable.Activity;
 import Timetable.Module;
 import Utils.MultiLineCellRenderer;
+import use_cases.activity.insert_activity.InsertActivity;
+import use_cases.activity.insert_activity.InsertActivityResult;
 import use_cases.course_module.insert_course_module.InsertCourseModule;
 import use_cases.course_module.insert_course_module.InsertCourseModuleResult;
 import use_cases.course_module.insert_course_module.UseCaseError;
@@ -288,8 +291,10 @@ public class MainScreen extends JFrame{
                 activityDurationTimeLabel.setText("Duration:");
                 activityTypeLabel.setText("Activity Type:");
 
-                panel.add(activityIDLabel);
-                panel.add(activityIDTextField);
+
+                //Omit Activity ID
+                //panel.add(activityIDLabel);
+                //panel.add(activityIDTextField);
 
                 panel.add(activityYearLabel);
                 List<Integer> years = new ArrayList<Integer>();
@@ -355,6 +360,34 @@ public class MainScreen extends JFrame{
 
                 JOptionPane.showMessageDialog(panelMain, panel);
 
+                Double startTime = (Double) activityStartTimeComboBox.getSelectedItem();
+                Double duration = (Double) activityDurationComboBox.getSelectedItem();
+                Double endTime = startTime + duration;
+                InsertActivity insertActivity = new InsertActivity();
+                insertActivity.setYear((Integer) activityYearComboBox.getSelectedItem());
+                insertActivity.setTerm((Integer) activityTermComboBox.getSelectedItem());
+                insertActivity.setWeek((Integer) activityWeekComboBox.getSelectedItem());
+                insertActivity.setWeekDay(activityDayComboBox.getSelectedIndex());
+                insertActivity.setWeekDay(activityDayComboBox.getSelectedIndex());
+                insertActivity.setCourseModuleId((Integer) moduleIDComboBox.getSelectedItem());
+                insertActivity.setStartTime((Double) activityStartTimeComboBox.getSelectedItem());
+                insertActivity.setEndTime(endTime);
+                insertActivity.setActivityCategoryId(activityTypeComboBox.getSelectedIndex() + 1);
+                InsertActivityResult newActivityResult = insertActivity.insert();
+
+                ActivityModel newActivity = newActivityResult.getActivityModel();
+
+                timetable.addActivity(newActivity.getId_activity(),
+                        newActivity.getYear(),
+                        newActivity.getTerm(),
+                        newActivity.getWeek(),
+                        newActivity.getDay_week(),
+                        newActivity.getId_course_module(),
+                        newActivity.getAct_starttime(),
+                        newActivity.getAct_endtime() - newActivity.getAct_starttime(),
+                        newActivity.getId_act_category());
+
+                /*
                 if (!activityIDTextField.getText().isEmpty()){
                     if(!timetable.getActivities().containsKey(Integer.parseInt(activityIDTextField.getText()))){
                         timetable.addActivity(Integer.parseInt(activityIDTextField.getText()),
@@ -375,6 +408,8 @@ public class MainScreen extends JFrame{
                 else{
                     JOptionPane.showMessageDialog(panelMain, "Please ensure all fields have correct input!", "Insert Activity Error", JOptionPane.ERROR_MESSAGE);
                 }
+                */
+
             }
         });
 

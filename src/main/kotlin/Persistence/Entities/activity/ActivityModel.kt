@@ -17,6 +17,7 @@ class ActivityModel(
     @field:Column(type = ColumnTypes.INTEGER) var day_week: Int? = null,
     @field:Column(type = ColumnTypes.REAL) var act_starttime: Double? = null,
     @field:Column(type = ColumnTypes.REAL) var act_endtime: Double? = null,
+    @field:Column(type = ColumnTypes.INTEGER) var year: Int? = null,
     @field:Column(type = ColumnTypes.INTEGER) var term: Int? = null,
     @field:Column(type = ColumnTypes.INTEGER) var week: Int? = null,
 

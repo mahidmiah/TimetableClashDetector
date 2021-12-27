@@ -69,6 +69,7 @@ CREATE TABLE activities (
   day_week INTEGER, -- 0 to 4 (0=Monday, 1=Tuesday, 2=Wednesday,3=Thursday,4=Friday)
   act_starttime REAL, -- 9.0, 9.5, 10.0
   act_endtime REAL,
+  year INTEGER,
   term INTEGER,
   week INTEGER,
   posted_by INTEGER, 

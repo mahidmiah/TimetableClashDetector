@@ -98,6 +98,7 @@ class MainCompSciSeed() {
                 term = 1,
                 week=1,
                 day_week = 0,
+                year=1, //courseCompSci.start_year
                 act_starttime = 9.0,
                 act_endtime = 11.0
             )
@@ -106,7 +107,7 @@ class MainCompSciSeed() {
             ActivityModel(
                 id_activity = null,
                 id_act_category = labType.id_act_category,
-
+                year=1,
                 id_course_module = jvmCourseModule.id_course_module,
                 posted_by = 1,
                 term = 1,
@@ -122,6 +123,7 @@ class MainCompSciSeed() {
                 id_act_category = examType.id_act_category,
                 id_course_module = hciCourseModule.id_course_module,
                 posted_by = 1,
+                year=1,
                 week=1,
                 term = 1,
                 day_week = 0,
@@ -135,6 +137,7 @@ class MainCompSciSeed() {
                 id_act_category = tutorialType.id_act_category,
                 id_course_module = jvmCourseModule.id_course_module,
                 posted_by = 1,
+                year=1,//courseCompSci.start_year
                 term = 1,
                 week=1,
                 day_week = 2,
@@ -151,6 +154,7 @@ class MainCompSciSeed() {
                 id_course_module = jvmCourseModule.id_course_module,
                 posted_by = 1,
                 term = 1,
+                year=1,
                 week=1,
                 day_week = 2,
                 act_starttime = 9.0,

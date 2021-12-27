@@ -50,12 +50,12 @@ class InstantiateDatabase {
         }
 
 
-        MainCompSciSeed().seed(dbConnector)
+        //MainCompSciSeed().seed(dbConnector)
     }
 }
 fun main(args: Array<String>) {
 
-    InstantiateDatabase().run()
+    //InstantiateDatabase().run()
     /*
     var timetable1 = Timetable(1, "BSc Computer Science", 2019, 2022, true)
 

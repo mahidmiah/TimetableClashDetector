@@ -81,7 +81,7 @@ class FetchCourseTimetable(val dbConnector: DBConnector) {
                 logger.info("ACTIVITY TYPE FOUND: " + act.id_act_category)
                 timetable.addActivity(
                     act.id_activity!!,
-                    courseModule.available_year!!,
+                    act.year!!,
                     act.term!!,
                     act.week!!,
                     act.day_week!!,

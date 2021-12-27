@@ -14,7 +14,8 @@ class ResultSetToActivity: ResultSetToModel<ActivityModel>() {
             week=rs.getInt("week"),
             day_week = rs.getInt("day_week"),
             posted_by = rs.getInt("posted_by"),
-            term = rs.getInt("term")
+            term = rs.getInt("term"),
+            year = rs.getInt("year")
         )
     }
 }
