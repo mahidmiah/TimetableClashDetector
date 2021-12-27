@@ -13,6 +13,7 @@ import Timetable.Module;
 import Utils.MultiLineCellRenderer;
 import use_cases.activity.insert_activity.InsertActivity;
 import use_cases.activity.insert_activity.InsertActivityResult;
+import use_cases.activity.remove_activity.RemoveActivity;
 import use_cases.course_module.insert_course_module.InsertCourseModule;
 import use_cases.course_module.insert_course_module.InsertCourseModuleResult;
 import use_cases.course_module.insert_course_module.UseCaseError;
@@ -434,9 +435,20 @@ public class MainScreen extends JFrame{
                         JOptionPane.YES_NO_OPTION,
                         JOptionPane.QUESTION_MESSAGE);
                 if(result == JOptionPane.YES_OPTION){
-                    timetable.removeActivity((Integer) activityIDComboBox.getSelectedItem());
-                    update(Integer.parseInt(yearGroupRadioGroup.getSelection().getActionCommand()), Integer.parseInt(termGroupRadioGroup.getSelection().getActionCommand()), Integer.parseInt(weekGroupRadioGroup.getSelection().getActionCommand()), table);
-                    JOptionPane.showMessageDialog(panelMain, "Activity has successfully been removed.", "Success", JOptionPane.PLAIN_MESSAGE);
+                    int targetIdToRemove = (Integer) activityIDComboBox.getSelectedItem();
+                    try {
+                        RemoveActivity activityRemover = new RemoveActivity();
+                        activityRemover.removeById(targetIdToRemove);
+                        timetable.removeActivity((Integer) activityIDComboBox.getSelectedItem());
+                        update(Integer.parseInt(yearGroupRadioGroup.getSelection().getActionCommand()), Integer.parseInt(termGroupRadioGroup.getSelection().getActionCommand()), Integer.parseInt(weekGroupRadioGroup.getSelection().getActionCommand()), table);
+                        JOptionPane.showMessageDialog(panelMain, "Activity has successfully been removed.", "Success", JOptionPane.PLAIN_MESSAGE);
+                    } catch (UseCaseError useCaseError) {
+                        String title = useCaseError.getTitleToDisplay();
+                        String message = useCaseError.getMessageToDisplay();
+
+
+                        JOptionPane.showMessageDialog(panelMain, message, title, JOptionPane.ERROR_MESSAGE);
+                    }
 
                 }
                 else if (result == JOptionPane.NO_OPTION){
