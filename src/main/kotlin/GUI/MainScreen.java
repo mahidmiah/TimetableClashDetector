@@ -415,10 +415,15 @@ public class MainScreen extends JFrame{
 
         ScalaDetector scalaDetector = new ScalaDetector(Timetable);
         scalaDetector.detect();
+        //System.out.println(scalaDetector.detect());
 
         KotlinDetector kotlinDetector = new KotlinDetector(Timetable);
         MultiLineCellRenderer renderer = new MultiLineCellRenderer();
-        renderer.clashDetectionInitiate(kotlinDetector.detect(), Year, Term, Week);
+        //System.out.println(kotlinDetector.detect());
+
+        //renderer.clashDetectionInitiate(kotlinDetector.detect(), Year, Term, Week, 0);
+
+        renderer.clashDetectionInitiate(scalaDetector.detect(), Year, Term, Week, 1);
 
         this.timeTable.setDefaultRenderer(Object.class, renderer);
         this.timeTable.getColumnModel().getColumn(0).setPreferredWidth(2);

@@ -1,7 +1,7 @@
 package Timetable
 
 class Week(weekNumber: Int) {
-    var weekNumber: Any
+    var weekNumber: Int
     var days = mutableMapOf<Int, Day>()
     init {
         this.weekNumber = weekNumber
