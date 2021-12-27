@@ -61,7 +61,8 @@ public class MainScreen extends JFrame{
     private JButton displayTableButton;
     private JLabel weekLabel;
     private JRadioButton Week2RadioButton;
-    private JButton clashDetectionButton;
+    private JRadioButton kotlinClashDetectionRadioButton;
+    private JRadioButton scalaClashDetectionRadioButton;
 
     private Logger logger = Logger.getLogger("MainScreen");
 
@@ -460,13 +461,6 @@ public class MainScreen extends JFrame{
             }
         });
 
-        clashDetectionButton.addActionListener(new ActionListener() {
-            @Override
-            public void actionPerformed(ActionEvent e) {
-                KotlinDetector detector = new KotlinDetector(timetable);
-                detector.detect();
-            }
-        });
     }
 
     public void updateAtCell(int Row, int Column){
@@ -511,17 +505,17 @@ public class MainScreen extends JFrame{
         }
         this.timeTable.setModel(this.TableModel);
 
-        ScalaDetector scalaDetector = new ScalaDetector(Timetable);
-        scalaDetector.detect();
-        //System.out.println(scalaDetector.detect());
-
-        KotlinDetector kotlinDetector = new KotlinDetector(Timetable);
         MultiLineCellRenderer renderer = new MultiLineCellRenderer();
-        //System.out.println(kotlinDetector.detect());
 
-        //renderer.clashDetectionInitiate(kotlinDetector.detect(), Year, Term, Week, 0);
-
-        renderer.clashDetectionInitiate(scalaDetector.detect(), Year, Term, Week, 1);
+        if(this.kotlinClashDetectionRadioButton.isSelected()){
+            KotlinDetector kotlinDetector = new KotlinDetector(Timetable);
+            renderer.clashDetectionInitiate(kotlinDetector.detect(), Year, Term, Week, 0);
+        }
+        else{
+            ScalaDetector scalaDetector = new ScalaDetector(Timetable);
+            scalaDetector.detect();
+            renderer.clashDetectionInitiate(scalaDetector.detect(), Year, Term, Week, 1);
+        }
 
         this.timeTable.setDefaultRenderer(Object.class, renderer);
         this.timeTable.getColumnModel().getColumn(0).setPreferredWidth(2);
