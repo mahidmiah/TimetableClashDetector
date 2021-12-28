@@ -525,7 +525,7 @@ public class MainScreen extends JFrame{
             ScalaDetectorViaModels scalaDetectorViaModels = new ScalaDetectorViaModels();
             //https://docs.scala-lang.org/overviews/collections-2.13/conversions-between-java-and-scala-collections.html
 
-            Map<Integer, Map<Integer, ActivityModel>> tempMap = scalaDetectorViaModels.checkForClashes(new ActivityModel().selectAll().stream().toList());
+            Map<Integer, Map<Integer, ActivityModel>> tempMap = scalaDetectorViaModels.getClashes(new ActivityModel().selectAll().stream().toList());
             System.out.println("Clash detection: " + tempMap);
 
 
