@@ -14,12 +14,26 @@ public class CourseTypeModel(
     ) : ModelSQLite<CourseTypeModel>("course_types", "id_course_type") {
 
     companion object {
-        const val UNDERGRADUATE="undergraduate";
-        const val POSTGRADUATE="postgraduate";
+        const val UNDERGRADUATE="Undergraduate";
+        const val POSTGRADUATE="Postgraduate";
     }
 
     override fun createFromResultSet(rs: ResultSet): CourseTypeModel {
         return CourseTypeResultSetToModel().rsToModel(rs)
+    }
+
+    fun selectByLabel(qLabel: String) : ArrayList<CourseTypeModel>{
+        val dbConnector = this.getDbConnector()
+        val records = dbConnector.rawSelectResultSet("SELECT * FROM ${tableName} WHERE label = '${qLabel}'", {
+            rs -> this.createArrayListFromResultSet(rs)
+        })
+
+        return records;
+    }
+
+    fun selectOneByLabel(qLabel: String) : CourseTypeModel? {
+        val records = this.selectByLabel(qLabel);
+        return if (records.size > 0) records[0] else null;
     }
 
 

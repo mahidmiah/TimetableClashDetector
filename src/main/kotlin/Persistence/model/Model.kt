@@ -1,6 +1,5 @@
 package Persistence.model
 import Persistence.DBConnection.DBConnector
-import Persistence.ResultSetToModel
 import Persistence.annotations.CEntity
 import Persistence.annotations.Column
 import Persistence.annotations.ColumnTypes
@@ -10,6 +9,8 @@ import java.util.logging.Logger
 import kotlin.reflect.KMutableProperty
 import kotlin.reflect.full.memberProperties
 import kotlin.reflect.jvm.javaField
+
+
 
 /**
  Resources about Reflections:
@@ -118,12 +119,8 @@ abstract class Model<TModel>(val tableName: String, val primaryColumn: String) {
 
         }
 
-        /**
-         * Result of the INSERT statement
-         * @param affectedRows Number of affected rows after insert
-         * @param generatedKeys Generated IDS
-         */
-        class InsertResult(val affectedRows: Int, val generatedKeys: ArrayList<Int>)
+
+
 
 
     }
@@ -141,7 +138,7 @@ abstract class Model<TModel>(val tableName: String, val primaryColumn: String) {
         val logger = Logger.getLogger("Model::setStatementViaJavaField")
 
         val columnType = columnDetails.type
-        field.setAccessible(true); // Needed to use the "get" method
+        field.setAccessible(true); // Needed to use the "get", "set" method
 
         try {
             val value = field.get(this)
@@ -185,10 +182,16 @@ abstract class Model<TModel>(val tableName: String, val primaryColumn: String) {
                 "VALUES(${questionMarks});", columns=columns) ;
     }
 
-
+    /**
+     * Method to obtain the DBConnector.
+     */
     open fun getDbConnector(): DBConnector {
         throw Exception("Not implemented")
     }
+
+    /**
+     * Method to convert ResultSet to a Model
+     */
     open fun createFromResultSet(rs: ResultSet) : TModel {
         throw Exception("Not implemented")
     }
@@ -200,6 +203,21 @@ abstract class Model<TModel>(val tableName: String, val primaryColumn: String) {
         }
         return arrayList
 
+    }
+
+    private val preSaveValidators : MutableMap<String, ModelValidator> = mutableMapOf()
+
+    fun addPreSaveValidators(validator: ModelValidator){
+        this.preSaveValidators.put(validator.id, validator);
+    }
+    fun removePreSaveValidator(validator: ModelValidator){
+        this.preSaveValidators.remove(validator.id)
+    }
+
+    private fun preSaveValidate(){
+        for (validator in this.preSaveValidators) {
+            validator.value.validate()
+        }
     }
 
 
@@ -220,7 +238,7 @@ abstract class Model<TModel>(val tableName: String, val primaryColumn: String) {
      */
     public fun connSave(dbConnector: DBConnector) : InsertResult{
 
-
+        this.preSaveValidate()
         val insertQueryPrep = generateInsertQuery()
         val query = insertQueryPrep.query
         //println("QUERY INSERT" + query)
@@ -261,6 +279,10 @@ abstract class Model<TModel>(val tableName: String, val primaryColumn: String) {
 
     }
 
+    /**
+     * Fetches the document via ID.
+     * The column that stores the ID is defined by the `primaryColumn`
+     */
     fun <PK> selectById(id: PK) : TModel? {
         val dbConnector = this.getDbConnector()
         val results = dbConnector.rawSelectResultSet("SELECT * FROM ${this.tableName} WHERE ${this.primaryColumn} = ${id.toString()}") { rs ->
@@ -272,6 +294,32 @@ abstract class Model<TModel>(val tableName: String, val primaryColumn: String) {
         return null;
     }
 
+    fun <PK> deleteById(targetId: PK) : DeleteResult {
+        val query = "DELETE FROM ${tableName} WHERE ${primaryColumn} = ?;";
+        val dbConnector = this.getDbConnector()
+        return dbConnector.startStatementEnvironment<DeleteResult> { conn ->
+            val pstmt: PreparedStatement = conn.prepareStatement(query);
+
+            if (targetId is Int) {
+                println("targetId is an INT")
+                pstmt.setInt(1, targetId)
+            } else {
+                pstmt.setString(1, targetId as String)
+            }
+
+            val affectedRows = pstmt.executeUpdate();
+            pstmt.close()
+
+            return@startStatementEnvironment DeleteResult(affectedRows)
+
+        }
+
+
+    }
+
+    /**
+     * Fetches all records from the table
+     */
     fun selectAll() : ArrayList<TModel> {
         val dbConnector = this.getDbConnector()
         val results = dbConnector.rawSelectResultSet("SELECT * FROM ${this.tableName}", { rs ->

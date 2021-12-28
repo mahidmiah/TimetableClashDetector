@@ -2,12 +2,22 @@ package GUI;
 
 import ClashDetectionKotlin.KotlinDetector;
 import ClashDetectionScala.ScalaDetector;
+import Persistence.Entities.activity.ActivityModel;
+import Persistence.Entities.activity_category.ActivityCategoryModel;
+import Persistence.Entities.course_module.CourseModuleModel;
 import Timetable.Timetable;
 import Timetable.Week;
 import Timetable.Day;
 import Timetable.Activity;
 import Timetable.Module;
 import Utils.MultiLineCellRenderer;
+import use_cases.activity.insert_activity.InsertActivity;
+import use_cases.activity.insert_activity.InsertActivityResult;
+import use_cases.activity.remove_activity.RemoveActivity;
+import use_cases.course_module.insert_course_module.InsertCourseModule;
+import use_cases.course_module.insert_course_module.InsertCourseModuleResult;
+import use_cases.course_module.insert_course_module.UseCaseError;
+import use_cases.course_module.remove_course_module.RemoveCourseModule;
 
 import javax.swing.*;
 import javax.swing.JFrame;
@@ -18,6 +28,7 @@ import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.util.*;
 import java.util.List;
+import java.util.logging.Logger;
 
 public class MainScreen extends JFrame{
     private DefaultTableModel TableModel;
@@ -52,6 +63,8 @@ public class MainScreen extends JFrame{
     private JRadioButton Week2RadioButton;
     private JRadioButton kotlinClashDetectionRadioButton;
     private JRadioButton scalaClashDetectionRadioButton;
+
+    private Logger logger = Logger.getLogger("MainScreen");
 
     public MainScreen(Timetable timetable){
 
@@ -158,8 +171,8 @@ public class MainScreen extends JFrame{
                 optionalChoiceGroup.add(trueRadioButton);
                 optionalChoiceGroup.add(falseRadioButton);
 
-                panel.add(moduleIDLabel);
-                panel.add(moduleIDTextField);
+                //panel.add(moduleIDLabel); Remove ModuleId
+                //panel.add(moduleIDTextField);
 
                 panel.add(moduleNameLabel);
                 panel.add(moduleNameTextField);
@@ -174,12 +187,26 @@ public class MainScreen extends JFrame{
 
                 JOptionPane.showMessageDialog(panelMain, panel);
 
-                if (!moduleIDTextField.getText().isEmpty() && !moduleNameTextField.getText().isEmpty() && optionalChoiceGroup.getSelection() != null){
-                    if(!timetable.getModules().containsKey(Integer.parseInt(moduleIDTextField.getText()))){
-                        table.addModule(Integer.parseInt(moduleIDTextField.getText()), moduleNameTextField.getText(), trueFalseDict.get(optionalChoiceGroup.getSelection().getActionCommand()));
-                        updateModulesList(table);
-                    }
-                    else {
+                // removed !moduleIDTextField.getText().isEmpty() &&
+                if (!moduleNameTextField.getText().isEmpty() && optionalChoiceGroup.getSelection() != null){
+                    if (timetable.getID() != null) {
+                        try {
+                            InsertCourseModule icm = new InsertCourseModule(timetable.getID(), moduleNameTextField.getText(), trueFalseDict.get(optionalChoiceGroup.getSelection().getActionCommand()));
+                            InsertCourseModuleResult res = icm.insert();
+                            //table.addModule(Integer.parseInt(moduleIDTextField.getText()), moduleNameTextField.getText(), trueFalseDict.get(optionalChoiceGroup.getSelection().getActionCommand()));
+                            CourseModuleModel courseModuleModel = res.getCourseModuleModel();
+                            table.addModule(courseModuleModel.getId_course_module(), moduleNameTextField.getText(), trueFalseDict.get(optionalChoiceGroup.getSelection().getActionCommand()));
+                            updateModulesList(table);
+                        } catch (UseCaseError insertError) {
+                            logger.warning(insertError.getMessage());
+                            insertError.printStackTrace();
+                            String messageToDisplay = insertError.getMessageToDisplay();
+                            String title = insertError.getTitleToDisplay();
+                            JOptionPane.showMessageDialog(panelMain, messageToDisplay, title, JOptionPane.ERROR_MESSAGE);
+                        }
+
+
+                    } else {
                         JOptionPane.showMessageDialog(panelMain, "Module ID already exists!", "Module ID Error", JOptionPane.ERROR_MESSAGE);
                     }
                 }
@@ -205,9 +232,24 @@ public class MainScreen extends JFrame{
                             JOptionPane.QUESTION_MESSAGE);
                     if(result == JOptionPane.YES_OPTION){
                         int moduleID = Integer.parseInt(String.valueOf(courseModuleJList.getSelectedValue().toString().charAt(4)));
-                        timetable.removeModule(moduleID);
-                        update(Integer.parseInt(yearGroupRadioGroup.getSelection().getActionCommand()), Integer.parseInt(termGroupRadioGroup.getSelection().getActionCommand()), Integer.parseInt(weekGroupRadioGroup.getSelection().getActionCommand()), table);
-                        JOptionPane.showMessageDialog(panelMain, "Module and all relevant activities have successfully been removed.", "Success", JOptionPane.PLAIN_MESSAGE);
+                        try {
+                            RemoveCourseModule removeCourseModule = new RemoveCourseModule();
+                            removeCourseModule.remove(moduleID);
+
+                            timetable.removeModule(moduleID);
+                            update(Integer.parseInt(yearGroupRadioGroup.getSelection().getActionCommand()), Integer.parseInt(termGroupRadioGroup.getSelection().getActionCommand()), Integer.parseInt(weekGroupRadioGroup.getSelection().getActionCommand()), table);
+                            JOptionPane.showMessageDialog(panelMain, "Module and all relevant activities have successfully been removed.", "Success", JOptionPane.PLAIN_MESSAGE);
+
+
+                        } catch (UseCaseError removeError) {
+
+                            removeError.printStackTrace();
+                            logger.warning(removeError.getMessage());
+
+                            String message = removeError.getMessageToDisplay();
+                            JOptionPane.showMessageDialog(panelMain, message, "Remove Module Error", JOptionPane.ERROR_MESSAGE);
+                        }
+
 
                     }
                     else if (result == JOptionPane.NO_OPTION){
@@ -251,8 +293,10 @@ public class MainScreen extends JFrame{
                 activityDurationTimeLabel.setText("Duration:");
                 activityTypeLabel.setText("Activity Type:");
 
-                panel.add(activityIDLabel);
-                panel.add(activityIDTextField);
+
+                //Omit Activity ID
+                //panel.add(activityIDLabel);
+                //panel.add(activityIDTextField);
 
                 panel.add(activityYearLabel);
                 List<Integer> years = new ArrayList<Integer>();
@@ -307,15 +351,56 @@ public class MainScreen extends JFrame{
                 panel.add(activityDurationComboBox);
 
                 panel.add(activityTypeLabel);
-                String types[] = { "Lecture", "Lab", "Tutorial"};
+
+                ArrayList<ActivityCategoryModel> results = new ActivityCategoryModel().selectAll();
+                List typesList = new ActivityCategoryModel().labelsToArray(results);
+
+                String[] types = (String[]) typesList.toArray(new String[typesList.size()]);
+
                 JComboBox activityTypeComboBox = new JComboBox(types);
                 panel.add(activityTypeComboBox);
 
                 JOptionPane.showMessageDialog(panelMain, panel);
 
+                Double startTime = (Double) activityStartTimeComboBox.getSelectedItem();
+                Double duration = (Double) activityDurationComboBox.getSelectedItem();
+                Double endTime = startTime + duration;
+                InsertActivity insertActivity = new InsertActivity();
+                insertActivity.setYear((Integer) activityYearComboBox.getSelectedItem());
+                insertActivity.setTerm((Integer) activityTermComboBox.getSelectedItem());
+                insertActivity.setWeek((Integer) activityWeekComboBox.getSelectedItem());
+                insertActivity.setWeekDay(activityDayComboBox.getSelectedIndex());
+                insertActivity.setWeekDay(activityDayComboBox.getSelectedIndex());
+                insertActivity.setCourseModuleId((Integer) moduleIDComboBox.getSelectedItem());
+                insertActivity.setStartTime((Double) activityStartTimeComboBox.getSelectedItem());
+                insertActivity.setEndTime(endTime);
+                insertActivity.setActivityCategoryId(activityTypeComboBox.getSelectedIndex() + 1);
+                InsertActivityResult newActivityResult = insertActivity.insert();
+
+                ActivityModel newActivity = newActivityResult.getActivityModel();
+
+                timetable.addActivity(newActivity.getId_activity(),
+                        newActivity.getYear(),
+                        newActivity.getTerm(),
+                        newActivity.getWeek(),
+                        newActivity.getDay_week(),
+                        newActivity.getId_course_module(),
+                        newActivity.getAct_starttime(),
+                        newActivity.getAct_endtime() - newActivity.getAct_starttime(),
+                        newActivity.getId_act_category());
+
+                /*
                 if (!activityIDTextField.getText().isEmpty()){
                     if(!timetable.getActivities().containsKey(Integer.parseInt(activityIDTextField.getText()))){
-                        timetable.addActivity(Integer.parseInt(activityIDTextField.getText()), (Integer) activityYearComboBox.getSelectedItem(), (Integer) activityTermComboBox.getSelectedItem(), (Integer) activityWeekComboBox.getSelectedItem(), activityDayComboBox.getSelectedIndex(), (Integer) moduleIDComboBox.getSelectedItem(), (Double) activityStartTimeComboBox.getSelectedItem(),  (Double) activityDurationComboBox.getSelectedItem(), activityTypeComboBox.getSelectedIndex());
+                        timetable.addActivity(Integer.parseInt(activityIDTextField.getText()),
+                                (Integer) activityYearComboBox.getSelectedItem(),
+                                (Integer) activityTermComboBox.getSelectedItem(),
+                                (Integer) activityWeekComboBox.getSelectedItem(),
+                                activityDayComboBox.getSelectedIndex(),
+                                (Integer) moduleIDComboBox.getSelectedItem(),
+                                (Double) activityStartTimeComboBox.getSelectedItem(),
+                                (Double) activityDurationComboBox.getSelectedItem(),
+                                activityTypeComboBox.getSelectedIndex() + 1);
                         update(Integer.parseInt(yearGroupRadioGroup.getSelection().getActionCommand()), Integer.parseInt(termGroupRadioGroup.getSelection().getActionCommand()), Integer.parseInt(weekGroupRadioGroup.getSelection().getActionCommand()), table);
                     }
                     else {
@@ -325,6 +410,8 @@ public class MainScreen extends JFrame{
                 else{
                     JOptionPane.showMessageDialog(panelMain, "Please ensure all fields have correct input!", "Insert Activity Error", JOptionPane.ERROR_MESSAGE);
                 }
+                */
+
             }
         });
 
@@ -349,9 +436,20 @@ public class MainScreen extends JFrame{
                         JOptionPane.YES_NO_OPTION,
                         JOptionPane.QUESTION_MESSAGE);
                 if(result == JOptionPane.YES_OPTION){
-                    timetable.removeActivity((Integer) activityIDComboBox.getSelectedItem());
-                    update(Integer.parseInt(yearGroupRadioGroup.getSelection().getActionCommand()), Integer.parseInt(termGroupRadioGroup.getSelection().getActionCommand()), Integer.parseInt(weekGroupRadioGroup.getSelection().getActionCommand()), table);
-                    JOptionPane.showMessageDialog(panelMain, "Activity has successfully been removed.", "Success", JOptionPane.PLAIN_MESSAGE);
+                    int targetIdToRemove = (Integer) activityIDComboBox.getSelectedItem();
+                    try {
+                        RemoveActivity activityRemover = new RemoveActivity();
+                        activityRemover.removeById(targetIdToRemove);
+                        timetable.removeActivity((Integer) activityIDComboBox.getSelectedItem());
+                        update(Integer.parseInt(yearGroupRadioGroup.getSelection().getActionCommand()), Integer.parseInt(termGroupRadioGroup.getSelection().getActionCommand()), Integer.parseInt(weekGroupRadioGroup.getSelection().getActionCommand()), table);
+                        JOptionPane.showMessageDialog(panelMain, "Activity has successfully been removed.", "Success", JOptionPane.PLAIN_MESSAGE);
+                    } catch (UseCaseError useCaseError) {
+                        String title = useCaseError.getTitleToDisplay();
+                        String message = useCaseError.getMessageToDisplay();
+
+
+                        JOptionPane.showMessageDialog(panelMain, message, title, JOptionPane.ERROR_MESSAGE);
+                    }
 
                 }
                 else if (result == JOptionPane.NO_OPTION){

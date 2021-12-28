@@ -4,7 +4,7 @@ CREATE TABLE course_types (
 ); 
  
 INSERT INTO course_types (label) 
-VALUES ('undergraduate'), ('postgraduate'); 
+VALUES ('Undergraduate'), ('Postgraduate');
  
 CREATE TABLE courses ( 
   id_course INTEGER PRIMARY KEY,
@@ -12,13 +12,13 @@ CREATE TABLE courses (
   start_year INTEGER, 
   end_year INTEGER, 
   id_course_type INTEGER, 
-  FOREIGN KEY(id_course_type) REFERENCES course_types(id_course_type) 
+  FOREIGN KEY(id_course_type) REFERENCES course_types(id_course_type) ON DELETE CASCADE ON UPDATE CASCADE
 ); 
  
 CREATE TABLE timetables ( 
   id_timetable INTEGER PRIMARY KEY,
   id_course INTEGER, 
-  FOREIGN KEY(id_course) REFERENCES courses(id_course) 
+  FOREIGN KEY(id_course) REFERENCES courses(id_course) ON DELETE CASCADE ON UPDATE CASCADE
 ); 
  
 CREATE TABLE modules ( 
@@ -37,7 +37,7 @@ CREATE TABLE activity_categories (
 ); 
  
 INSERT INTO activity_categories (label) 
-VALUES ('lecture'), ('tutorial'); 
+VALUES ('Lecture'), ('Tutorial'), ('Exam'), ('Lab');
  
 CREATE TABLE course_modules ( 
   id_course_module INTEGER PRIMARY KEY,
@@ -45,8 +45,8 @@ CREATE TABLE course_modules (
   id_course INTEGER, 
   is_optional INTEGER, -- 0 or 1 
   available_year INTEGER, 
-  FOREIGN KEY(id_module) REFERENCES modules(id_module), 
-  FOREIGN KEY(id_course) REFERENCES courses(id_course) 
+  FOREIGN KEY(id_module) REFERENCES modules(id_module) ON DELETE SET NULL,
+  FOREIGN KEY(id_course) REFERENCES courses(id_course) ON DELETE SET NULL
 ); 
  
 CREATE TABLE users ( 
@@ -69,10 +69,11 @@ CREATE TABLE activities (
   day_week INTEGER, -- 0 to 4 (0=Monday, 1=Tuesday, 2=Wednesday,3=Thursday,4=Friday)
   act_starttime REAL, -- 9.0, 9.5, 10.0
   act_endtime REAL,
+  year INTEGER,
   term INTEGER,
-  week INTEGER ,
+  week INTEGER,
   posted_by INTEGER, 
-  FOREIGN KEY(id_act_category) REFERENCES activity_categories(id_act_category),
-  FOREIGN KEY(id_course_module) REFERENCES course_modules(id_course_module),
-  FOREIGN KEY(posted_by) REFERENCES users(id_user)
+  FOREIGN KEY(id_act_category) REFERENCES activity_categories(id_act_category) ON DELETE SET NULL ON UPDATE CASCADE ,
+  FOREIGN KEY(id_course_module) REFERENCES course_modules(id_course_module) ON DELETE CASCADE ON UPDATE CASCADE ,
+  FOREIGN KEY(posted_by) REFERENCES users(id_user) ON DELETE SET NULL ON UPDATE CASCADE
 );

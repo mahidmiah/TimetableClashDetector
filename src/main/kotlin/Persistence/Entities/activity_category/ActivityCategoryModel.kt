@@ -16,10 +16,25 @@ class ActivityCategoryModel(
     ): ModelSQLite<ActivityCategoryModel>("activity_categories", "id_act_category") {
 
         companion object {
-            const val tutorial = "tutorial"
-            const val lecture = "lecture"
+            const val tutorial = "Tutorial"
+            const val lecture = "Lecture"
+            const val lab = "Lab"
+            const val exam = "Exam"
+
+            fun getStaticLabels() : List<String> {
+                return listOf<String>(
+                    ActivityCategoryModel.tutorial,
+                    ActivityCategoryModel.lecture,
+                    ActivityCategoryModel.lab,
+                    ActivityCategoryModel.exam,
+                )
+            }
         }
 
+
+        /**
+         * Fetches Activity Categories by the specified label
+         */
         fun fetchByLabel(qlabel: String) : ActivityCategoryModel?{
             val dbConnector = this.getDbConnector()
             val results = dbConnector.rawSelectResultSet("SELECT * FROM ${tableName} WHERE label = '${qlabel}'") { rs ->
@@ -30,6 +45,14 @@ class ActivityCategoryModel(
             }
             return null;
 
+        }
+        /**
+         * Converts a list of ActivityCategory models to a list of just their labels
+         * Example:
+         * `labelsToArray(actCatModels) -> List<String> = {"Exam", "Tutorial"}`
+         */
+        fun labelsToArray(actCatModels: ArrayList<ActivityCategoryModel>): List<String?> {
+            return actCatModels.map { a -> a.label }
         }
 
         override fun createFromResultSet(rs: ResultSet): ActivityCategoryModel {
