@@ -55,8 +55,8 @@ class InstantiateDatabase {
     }
 }
 fun main(args: Array<String>) {
-
-    //InstantiateDatabase().run()
+    // Uncomment this code if you want to clean the database
+    InstantiateDatabase().run()
     /*
     var timetable1 = Timetable(1, "BSc Computer Science", 2019, 2022, true)
 
@@ -73,7 +73,7 @@ fun main(args: Array<String>) {
     */
 
     val dbConnector = SingletonDBConnector.getConnector()
-    val timetable1 = FetchCourseTimetable(dbConnector).fetchWithYear("BSc Computer Science", 2019)!!
+    //val timetable1 = FetchCourseTimetable(dbConnector).fetchWithYear("BSc Computer Science", 2019)!!
     
     val mainMenu = MenuScreen()
     mainMenu.isVisible = true

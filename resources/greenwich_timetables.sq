@@ -4,7 +4,7 @@ CREATE TABLE course_types (
 ); 
  
 INSERT INTO course_types (label) 
-VALUES ('undergraduate'), ('postgraduate'); 
+VALUES ('Undergraduate'), ('Postgraduate');
  
 CREATE TABLE courses ( 
   id_course INTEGER PRIMARY KEY,

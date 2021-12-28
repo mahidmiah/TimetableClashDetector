@@ -14,8 +14,8 @@ public class CourseTypeModel(
     ) : ModelSQLite<CourseTypeModel>("course_types", "id_course_type") {
 
     companion object {
-        const val UNDERGRADUATE="undergraduate";
-        const val POSTGRADUATE="postgraduate";
+        const val UNDERGRADUATE="Undergraduate";
+        const val POSTGRADUATE="Postgraduate";
     }
 
     override fun createFromResultSet(rs: ResultSet): CourseTypeModel {

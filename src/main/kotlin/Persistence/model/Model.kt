@@ -119,18 +119,8 @@ abstract class Model<TModel>(val tableName: String, val primaryColumn: String) {
 
         }
 
-        /**
-         * Result of the INSERT statement
-         * @param affectedRows Number of affected rows after insert
-         * @param generatedKeys Generated IDS
-         */
-        class InsertResult(val affectedRows: Int, val generatedKeys: ArrayList<Int>)
 
-        /**
-         * Result of the DELETE statement
-         * @param affectedRows Number of affected rows after delete
-         */
-        class DeleteResult(val affectedRows: Int)
+
 
 
     }

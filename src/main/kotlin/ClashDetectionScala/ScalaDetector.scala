@@ -3,7 +3,8 @@ package ClashDetectionScala
 import Timetable.Activity
 
 import scala.collection.mutable.ListBuffer
-import scala.jdk.CollectionConverters.*
+import scala.jdk.CollectionConverters.CollectionHasAsScala
+
 
 class ScalaDetector(timetable: Timetable.Timetable) {
 
