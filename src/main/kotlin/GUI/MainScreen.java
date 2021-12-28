@@ -2,6 +2,9 @@ package GUI;
 
 import ClashDetectionKotlin.KotlinDetector;
 import ClashDetectionScala.ScalaDetector;
+import ClashDetectionScala.ScalaDetectorViaModels;
+import scala.jdk.javaapi.CollectionConverters;
+
 import Persistence.Entities.activity.ActivityModel;
 import Persistence.Entities.activity_category.ActivityCategoryModel;
 import Persistence.Entities.course_module.CourseModuleModel;
@@ -512,9 +515,21 @@ public class MainScreen extends JFrame{
             renderer.clashDetectionInitiate(kotlinDetector.detect(), Year, Term, Week, 0);
         }
         else{
+            /*
             ScalaDetector scalaDetector = new ScalaDetector(Timetable);
             scalaDetector.detect();
             renderer.clashDetectionInitiate(scalaDetector.detect(), Year, Term, Week, 1);
+
+             */
+
+            ScalaDetectorViaModels scalaDetectorViaModels = new ScalaDetectorViaModels();
+            //https://docs.scala-lang.org/overviews/collections-2.13/conversions-between-java-and-scala-collections.html
+
+            Map<Integer, Map<Integer, ActivityModel>> tempMap = scalaDetectorViaModels.checkForClashes(new ActivityModel().selectAll().stream().toList());
+            System.out.println("Clash detection: " + tempMap);
+
+
+
         }
 
         this.timeTable.setDefaultRenderer(Object.class, renderer);
