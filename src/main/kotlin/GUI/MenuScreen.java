@@ -62,8 +62,8 @@ public class MenuScreen extends JFrame{
                 courseTypeGroup.add(trueRadioButton);
                 courseTypeGroup.add(falseRadioButton);
 
-                panel.add(courseIDLabel);
-                panel.add(courseIDTextField);
+                //anel.add(courseIDLabel);
+                //panel.add(courseIDTextField);
 
                 panel.add(courseNameLabel);
                 panel.add(courseNameTextField);
