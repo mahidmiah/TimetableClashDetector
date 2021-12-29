@@ -1,7 +1,8 @@
 package GUI;
 
+import GUI.timetable_selector_modal_screen.ITimetableConfirmationListener;
+import GUI.timetable_selector_modal_screen.TimetableSelectorModal;
 import Persistence.Entities.course.CourseModel;
-import Persistence.Entities.course_module.CourseModuleModel;
 import Persistence.Entities.course_type.CourseTypeModel;
 import Persistence.Entities.timetable.TimetableModel;
 import Timetable.Timetable;
@@ -130,6 +131,26 @@ public class MenuScreen extends JFrame{
                 else{
                     JOptionPane.showMessageDialog(mainPanel, "Please ensure all fields have correct input!", "Add New Course Error", JOptionPane.ERROR_MESSAGE);
                 }
+
+            }
+        });
+        MenuScreen self = this;
+        loadTimetableButton.addActionListener(new ActionListener() {
+            @Override
+            public void actionPerformed(ActionEvent e) {
+                TimetableSelectorModal timetableSelectorScreen = new TimetableSelectorModal();
+                timetableSelectorScreen.setVisible(true);
+                timetableSelectorScreen.timetableConfirmationListener = new ITimetableConfirmationListener() {
+                    @Override
+                    public void actionPerformed(Timetable timetable) {
+
+
+                        MainScreen mainScreen = new MainScreen(timetable);
+                        mainScreen.setVisible(true);
+                        timetableSelectorScreen.dispose();
+                        self.dispose();
+                    }
+                };
 
             }
         });
