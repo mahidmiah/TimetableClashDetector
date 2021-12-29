@@ -14,12 +14,9 @@ class FetchTimetables {
         val fetchCourseTimetable = FetchCourseTimetable(SingletonDBConnector.getConnector())
 
         for (timetableDoc in timetableModels) {
-            val course = timetableDoc.fetchThisCourse()
-            if (course != null) {
-                val timetableGui = fetchCourseTimetable.fetchWithYear(course.name!!, course.start_year!!);
-                if (timetableGui != null) {
-                    timetablesForGui.add(timetableGui);
-                }
+            val timetableGui = fetchCourseTimetable.fetchByTimetableId(timetableDoc.id_timetable!!);
+            if (timetableGui != null) {
+                timetablesForGui.add(timetableGui);
             }
 
         }
