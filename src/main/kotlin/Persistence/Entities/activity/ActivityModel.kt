@@ -23,9 +23,25 @@ class ActivityModel(
 
     ): ModelSQLite<ActivityModel>("activities", "id_activity") {
 
-        fun fetchThisCourseModule() : CourseModuleModel?{
-            return CourseModuleModel().selectById(this.id_course_module)
+    var lastFetchCourseModuleModel: CourseModuleModel? = null;
+    fun isOptional() : Boolean {
+        if (this.lastFetchCourseModuleModel == null) {
+            this.fetchThisCourseModule();
         }
+        if (this.lastFetchCourseModuleModel != null) {
+            if(this.lastFetchCourseModuleModel!!.is_optional != null){
+                return this.lastFetchCourseModuleModel!!.is_optional == 1
+            }
+        }
+        return false;
+    }
+
+    fun fetchThisCourseModule() : CourseModuleModel?{
+        val courseModule = CourseModuleModel().selectById(this.id_course_module);
+        this.lastFetchCourseModuleModel = courseModule;
+
+        return courseModule;
+    }
 
     override fun createFromResultSet(rs: ResultSet): ActivityModel {
         return ResultSetToActivity().rsToModel(rs)

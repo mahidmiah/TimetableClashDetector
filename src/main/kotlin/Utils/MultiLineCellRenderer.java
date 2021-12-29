@@ -1,5 +1,7 @@
 package Utils;
 
+import Persistence.Entities.activity.ActivityModel;
+import Timetable.Activity;
 import scala.math.Ordering;
 
 import javax.swing.*;
@@ -15,6 +17,7 @@ public class MultiLineCellRenderer extends JTextArea implements TableCellRendere
     private int colN;
     private ArrayList<java.util.List<Integer>> clashSlots = new ArrayList<>();
     private int detectionMode;
+    private ArrayList<ActivityModel> actModelsList = new ArrayList<>();
 
     public MultiLineCellRenderer() {
         setLineWrap(true);
@@ -30,6 +33,10 @@ public class MultiLineCellRenderer extends JTextArea implements TableCellRendere
             }
         }
         this.detectionMode = mode;
+    }
+
+    public void clashDetectionInitiate(){
+
     }
 
     public void clashDetectionInitiate(scala.collection.immutable.List<scala.collection.immutable.List<java.lang.Object>> slots, int year, int term, int week, int mode){
@@ -77,6 +84,12 @@ public class MultiLineCellRenderer extends JTextArea implements TableCellRendere
         }
 
         for (java.util.List<Integer> slot : clashSlots){
+            int count = 0;
+            for (int elemSlot : slot) {
+
+                //System.out.println("ELEM SLOT: " + count + " = " + elemSlot);
+                count += 1;
+            }
             if (row == slot.get(3) && column == slot.get(4)){
                 if (this.detectionMode == 0){
                     setBackground(Color.red);

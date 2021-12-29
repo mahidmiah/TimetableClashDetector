@@ -29,6 +29,7 @@ import javax.swing.table.DefaultTableModel;
 import java.awt.*;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
+import java.sql.Time;
 import java.util.*;
 import java.util.List;
 import java.util.logging.Logger;
@@ -525,13 +526,19 @@ public class MainScreen extends JFrame{
             ScalaDetectorViaModels scalaDetectorViaModels = new ScalaDetectorViaModels();
             //https://docs.scala-lang.org/overviews/collections-2.13/conversions-between-java-and-scala-collections.html
 
-            Map<Integer, Map<Integer, ActivityModel>> tempMap = scalaDetectorViaModels.getClashes(new ActivityModel().selectAll().stream().toList());
-            System.out.println("Clash detection: " + tempMap);
-            Boolean isClashing = scalaDetectorViaModels.isClashingFromClashMap(tempMap, 1);
+            //Map<Integer, Map<Integer, ActivityModel>> tempMap = scalaDetectorViaModels.getClashes(new ActivityModel().selectAll().stream().toList());
+            //System.out.println("Clash detection: " + tempMap);
+            //Boolean isClashing = scalaDetectorViaModels.isClashingFromClashMap(tempMap, 1);
 
-            Boolean isClashing2 = scalaDetectorViaModels.simpleAreActivitiesCrashing(new ActivityModel().selectAll().stream().toList());
+            Set<Integer> clashIds = scalaDetectorViaModels.simpleGetActivitiesIdsClashesSetAsJava(new ActivityModel().selectAll().stream().toList());
+            System.out.println("clashIds: " + clashIds);
+            java.util.List<java.util.List<Integer>> clashSlots = scalaDetectorViaModels.getTableSlotsAsJava(Timetable, clashIds);
+            renderer.clashDetectionInitiate(clashSlots, Year, Term, Week, 1);
+            /*
             System.out.println("IS CLASHING1: " + isClashing);
-            System.out.println("IS CLASHING2: " + isClashing2);
+            System.out.println("IS CLASHING2: " + (clashIds.size() > 0));
+
+             */
 
 
 

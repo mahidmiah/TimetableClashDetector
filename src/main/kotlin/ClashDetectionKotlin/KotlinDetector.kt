@@ -10,6 +10,9 @@ class KotlinDetector(TimetableObj: Timetable) {
         this.Timetable = TimetableObj
     }
 
+    /**
+     * @return MutableList<List<Int>> Element of the list [0 -> year table, 1->term table number, 2->week table number, 3->Time table number, 4-> WeekDay table number]
+     */
     fun getTableSlots(clashes: Set<Int>): MutableList<List<Int>> {
 
         val slots : MutableList<List<Int>> = arrayListOf()

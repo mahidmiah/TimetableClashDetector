@@ -1,0 +1,5 @@
+package ClashDetectionScala
+
+class ExperirmentalScalaDetectorViaModels {
+
+}
