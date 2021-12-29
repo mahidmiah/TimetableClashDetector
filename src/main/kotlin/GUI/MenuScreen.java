@@ -133,5 +133,14 @@ public class MenuScreen extends JFrame{
 
             }
         });
+
+        loadTimetableButton.addActionListener(new ActionListener() {
+            @Override
+            public void actionPerformed(ActionEvent e) {
+                TimetableSelectorModal timetableSelector = new TimetableSelectorModal();
+                timetableSelector.setVisible(true);
+
+            }
+        });
     }
 }

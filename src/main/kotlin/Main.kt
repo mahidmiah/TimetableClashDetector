@@ -19,7 +19,7 @@ class InstantiateDatabase {
         val logger = Logger.getLogger("main")
 // Uncomment this code if you want to clean the database
         try {
-            dbConnector.resetFile()
+            //dbConnector.resetFile()
 
         } catch (e: AccessControlException) {
 
