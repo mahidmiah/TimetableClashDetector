@@ -1,4 +1,4 @@
-package GUI;
+package GUI.timetable_selector_modal_screen;
 
 import Timetable.Timetable;
 import use_cases.timetable.fetch_timetables.FetchTimetables;
@@ -10,7 +10,7 @@ import java.util.ArrayList;
 
 
 /**
- * Modal to select Timetables
+ * Modal Screen to select Timetables
  * Helpful links:
  * https://docs.oracle.com/javase/tutorial/uiswing/components/combobox.html
  *
@@ -22,8 +22,17 @@ public class TimetableSelectorModal extends JFrame {
     private JButton cancelBtn;
     private JLabel timetableInstructionLabel;
 
+    //Events
+    /**
+     * Listener triggered when the user confirms the Timetable selection
+     */
+    public ITimetableConfirmationListener timetableConfirmationListener;
+
 
     // DATA
+    /**
+     * List of timetables
+     */
     private ArrayList<Timetable> selectorTimetables = new ArrayList<Timetable>();
 
     public TimetableSelectorModal(){
@@ -33,23 +42,47 @@ public class TimetableSelectorModal extends JFrame {
 
         this.setupComboBoxData();
 
+
         this.pack();
+
+        TimetableSelectorModal self = this;
+        okBtn.addActionListener(new ActionListener() {
+            @Override
+            public void actionPerformed(ActionEvent e) {
+                Object selectedId = self.timetableComboBox.getSelectedItem();
+                Timetable foundTimetable = self.findTimetableById(self.selectorTimetables, (Integer) selectedId);
+                if (foundTimetable != null) {
+                    self.onTimetableConfirmation(foundTimetable);
+                }
+
+            }
+        });
+        cancelBtn.addActionListener(new ActionListener() {
+            @Override
+            public void actionPerformed(ActionEvent e) {
+                self.dispose();
+            }
+        });
     }
 
     public void setupComboBoxData() {
         FetchTimetables fetchTimetables = new FetchTimetables();
         this.selectorTimetables = fetchTimetables.fetchAsArrayList();
-        System.out.println("TIMETABLES: " + selectorTimetables);
+        //System.out.println("TIMETABLES: " + selectorTimetables);
+
+        /*
+        Here if we need to flat the ArrayList to just Ids.
         ArrayList<Integer> timetablesIds = this.flatTimetableArrayListToIds(this.selectorTimetables);
         System.out.println("TIMETABLES IDS: " + timetablesIds);
         Integer[] ids = timetablesIds.toArray(new Integer[timetablesIds.size()]);
         System.out.println("TIMETABLES IDS[]: " + ids);
 
+         */
+
 
         ComboBoxRenderer renderer= new ComboBoxRenderer();
         timetableComboBox.setRenderer(renderer);
         for (Timetable timetable : this.selectorTimetables) {
-
             timetableComboBox.addItem(timetable.getID());
         }
 
@@ -68,6 +101,23 @@ public class TimetableSelectorModal extends JFrame {
 
     }
 
+    public void onTimetableConfirmation(Timetable timetable){
+        if (this.timetableConfirmationListener != null) {
+            this.timetableConfirmationListener.actionPerformed(timetable);
+        }
+    }
+
+    public Timetable findTimetableById(ArrayList<Timetable> localTimetables, Integer id){
+        for (int i = 0; i < localTimetables.size(); i++) {
+            Timetable timetable = localTimetables.get(i);
+            if (timetable.getID() == id) {
+                return timetable;
+            }
+        }
+        return null;
+    }
+
+
     class ComboBoxRenderer extends JLabel implements ListCellRenderer {
         public ComboBoxRenderer() {
             setOpaque(true);
@@ -75,15 +125,7 @@ public class TimetableSelectorModal extends JFrame {
             setVerticalAlignment(CENTER);
         }
 
-        public Timetable findTimetableById(ArrayList<Timetable> localTimetables, Integer id){
-            for (int i = 0; i < localTimetables.size(); i++) {
-                Timetable timetable = localTimetables.get(i);
-                if (timetable.getID() == id) {
-                    return timetable;
-                }
-            }
-            return null;
-        }
+
 
         public Component getListCellRendererComponent(
                 JList list,
@@ -92,7 +134,9 @@ public class TimetableSelectorModal extends JFrame {
                 boolean isSelected,
                 boolean cellHasFocus
         ) {
-            int selectedIndex = ((Integer)value).intValue();
+
+            Object timetableId = value;
+            int selectedIndex = ((Integer)timetableId).intValue();
             if (isSelected) {
                 setBackground(list.getSelectionBackground());
                 setForeground(list.getSelectionForeground());
@@ -101,8 +145,7 @@ public class TimetableSelectorModal extends JFrame {
                 setForeground(list.getForeground());
             }
 
-            System.out.println("VALUE: + " + value);
-            Timetable foundTimetable = this.findTimetableById(selectorTimetables, (Integer) value);
+            Timetable foundTimetable = findTimetableById(selectorTimetables, (Integer) timetableId);
             if (foundTimetable != null) {
                 setText(foundTimetable.getName().toString());
             } else {
