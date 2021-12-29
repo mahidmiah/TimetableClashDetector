@@ -527,6 +527,11 @@ public class MainScreen extends JFrame{
 
             Map<Integer, Map<Integer, ActivityModel>> tempMap = scalaDetectorViaModels.getClashes(new ActivityModel().selectAll().stream().toList());
             System.out.println("Clash detection: " + tempMap);
+            Boolean isClashing = scalaDetectorViaModels.isClashingFromClashMap(tempMap, 1);
+
+            Boolean isClashing2 = scalaDetectorViaModels.simpleAreActivitiesCrashing(new ActivityModel().selectAll().stream().toList());
+            System.out.println("IS CLASHING1: " + isClashing);
+            System.out.println("IS CLASHING2: " + isClashing2);
 
 
 

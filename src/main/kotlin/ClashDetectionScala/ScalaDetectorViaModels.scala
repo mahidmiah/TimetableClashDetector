@@ -5,6 +5,36 @@ import Persistence.Entities.activity.ActivityModel
 import scala.collection.mutable
 import scala.jdk.CollectionConverters.*
 
+class ActivityHandler(val actModel: ActivityModel) {
+  def clash(other: ActivityHandler): Boolean = {
+
+    val year: Int = actModel.getYear();
+    val week: Int = actModel.getWeek();
+    val weekDay: Int = actModel.getDay_week();
+    val term: Int = actModel.getTerm();
+    val startTime: Double = actModel.getAct_starttime();
+    val endTime: Double = actModel.getAct_endtime();
+    val otherModel = other.actModel;
+    return (
+      (this.actModel.getId_activity() != otherModel.getId_activity()) &&
+      (otherModel.getYear() == year) &&
+        (otherModel.getTerm() == term) &&
+        (otherModel.getWeek() == week) &&
+        (otherModel.getDay_week() == weekDay) &&
+        (
+          (
+            (startTime >= otherModel.getAct_starttime()) && startTime < otherModel.getAct_endtime() ||
+              (endTime > otherModel.getAct_endtime() && endTime <= otherModel.getAct_endtime() )
+            ) ||
+            (
+              (otherModel.getAct_starttime() >= startTime) && otherModel.getAct_starttime() < endTime ||
+                (otherModel.getAct_endtime() > endTime && otherModel.getAct_endtime() <= endTime )
+              )
+          )
+
+      )
+  }
+}
 class ScalaDetectorViaModels {
 
   def checkSingularClash(actModel: ActivityModel, activityModels: List[ActivityModel]): List[ActivityModel] = {
@@ -91,7 +121,16 @@ class ScalaDetectorViaModels {
     val newActModel = activityModelsList.apply(0)
     val newActModelsList = activityModelsList.drop(1)
     clashesMap = clashesMap + (newActModel.getId_activity().asInstanceOf[Int] -> Map());
-    val clashesMapResult = checkSingularClashRecursive(clashesMap, newActModel, newActModelsList)
+    var clashesMapResult = checkSingularClashRecursive(clashesMap, newActModel, newActModelsList)
+    /*
+    for ((actId, clashingElems) <- clashesMapResult) {
+      for ((clashingId, clashingActModel) <- clashingElems) {
+        clashesMapResult = clashesMapResult + (actId -> (clashesMapResult(actId) + (clashingId -> activityModelsList.find(a => a.getId_activity()))))
+      }
+
+    }
+    */
+
 
     for ((k,v) <- clashesMapResult) println(s"key: $k, value: $v")
     var clashesMapToJava:java.util.Map[Integer, java.util.Map[Integer, ActivityModel]] = mutable.HashMap().asJava
@@ -107,6 +146,46 @@ class ScalaDetectorViaModels {
 
     return clashesMapToJava;
 
+  }
+
+  def isClashingFromClashMap(clashMap: java.util.Map[Integer, java.util.Map[Integer, ActivityModel]], activityId: Int) : Boolean = {
+    val clashMapScala = clashMap.asScala;
+    val newListBuffer: mutable.Buffer[Int] = mutable.Buffer();
+    for ((actId, actClashes) <- clashMapScala) {
+      for ((clashId, actModel) <- actClashes.asScala) {
+        if (clashId == activityId || actId == activityId) {
+          return true;
+        }
+      }
+
+    }
+
+    return false;
+
+
+  }
+
+  def simpleAreActivitiesCrashing(activities: java.util.List[ActivityModel]): Boolean = {
+    var actModelsBuffer = activities.asScala;
+
+    // Convert Buffer to List
+    var activityModelsList: List[ActivityHandler] = actModelsBuffer.foldLeft(List[ActivityHandler]()){(accumulator, a) =>
+      accumulator :+ ActivityHandler(a)
+    }
+
+    val clashingList = (for (x <- activityModelsList; y <- activityModelsList if x clash(y)) yield (x, y))
+    return clashingList.isEmpty == false;
+
+  }
+
+  def simpleIsActivityCrashing(targetActivityModel: ActivityModel, activities: java.util.List[ActivityModel]): Boolean = {
+    var actModelsBuffer = activities.asScala;
+    // Convert Buffer to List
+    var activityModelsList: List[ActivityHandler] = actModelsBuffer.foldLeft(List[ActivityHandler]()){(accumulator, a) =>
+      accumulator :+ ActivityHandler(a)
+    }
+
+    return activityModelsList.find(a => (activityModelsList.find(b => a.clash(b))).isEmpty == false).isEmpty == false
   }
 
   /**
