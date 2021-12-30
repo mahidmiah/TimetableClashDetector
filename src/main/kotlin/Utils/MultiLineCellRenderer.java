@@ -27,11 +27,14 @@ public class MultiLineCellRenderer extends JTextArea implements TableCellRendere
     }
 
     public void clashDetectionInitiate(java.util.List<java.util.List<java.lang.Integer>> slots, int year, int term, int week, int mode){
+        System.out.println("slots: " + slots);
         for (java.util.List<java.lang.Integer> slot : slots){
+            System.out.println("SLOT ELEM: " + slot);
             if (slot.get(0) == year && slot.get(1) == term && slot.get(2) == week){
                 this.clashSlots.add(slot);
             }
         }
+        System.out.println("clashSlots: " + this.clashSlots);
         this.detectionMode = mode;
     }
 

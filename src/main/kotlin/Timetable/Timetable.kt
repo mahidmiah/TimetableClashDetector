@@ -48,6 +48,31 @@ class Timetable (val ID: Int? = null, Name: String, StartYear: Int, EndYear: Int
         println("-".repeat(300))
     }
 
+    fun altPrint(){
+        println("::::::::::::: TIMETABLE PRINT :::::::::::::::");
+        println("Timetable Years Length: " + this.table.values.size)
+        for (year in this.table.values){
+            var finalMessage = "";
+            val messageArray: ArrayList<String> = ArrayList<String>();
+             messageArray.add("Year ${year.yearNumber}");
+            for (term in year.terms.values){
+                messageArray.add("Term: ${term.termNumber}");
+                for (week in term.weeks.values){
+                    messageArray.add("Week: ${week.weekNumber}");
+                    for (day in week.days.values){
+                        messageArray.add("Day: ${day.dayNumber}");
+                        messageArray.add("Schedule: ${day.TimeSlot}");
+                    }
+
+                }
+
+            }
+            finalMessage = messageArray.joinToString("- ");
+            println(finalMessage)
+
+        }
+    }
+
     fun addModule(ID: Int, Name: String, IsOptional: Boolean){
         this.modules[ID] = Module(ID, Name, IsOptional)
     }
