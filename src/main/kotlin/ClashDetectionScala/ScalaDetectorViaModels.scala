@@ -103,7 +103,6 @@ class ScalaDetectorViaModels {
               val slotHourNum: Double = slot._1 // 9.0,9.5,10,10.5 e.t.c
               val slotActivities: scala.collection.mutable.Buffer[Activity] = slot._2.asScala // Activity
               if (slotActivities != null){
-                System.out.println("FOR EACH SLOT: " + slot)
                 if (slotActivities.size > 0){
                   for (activity <- slotActivities){
                     if (clashes.contains(activity.getID)){
