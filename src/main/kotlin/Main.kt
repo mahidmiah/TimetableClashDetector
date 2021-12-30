@@ -74,9 +74,16 @@ fun main(args: Array<String>) {
 
     //val dbConnector = SingletonDBConnector.getConnector()
     //val timetable1 = FetchCourseTimetable(dbConnector).fetchWithYear("BSc Computer Science", 2019)!!
-    
+
     val mainMenu = MenuScreen()
     mainMenu.isVisible = true
+
+    //val timetable1 = FetchCourseTimetable(dbConnector).fetchWithYear("BSc Computer Science", 2019)
+    //val mainScreen = MainScreen(timetable1)
+    //mainScreen.isVisible = true
+
+    //val mainMenu = MenuScreen()
+    //mainMenu.isVisible = true
 
 
 //    timetable1.print()
