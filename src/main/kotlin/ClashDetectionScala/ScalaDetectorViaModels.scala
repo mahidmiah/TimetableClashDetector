@@ -79,21 +79,23 @@ class ActivityHandler(val actModel: ActivityModel) {
 }
 class ScalaDetectorViaModels {
 
+  def getDoubleTimeSlotToInt(): mutable.HashMap[Double, Integer] ={
+    val doubleTimeSlotToInt: mutable.HashMap[Double, Integer] = mutable.HashMap[Double, Integer]();
+
+    var counterHour = 9.0
+    var counterRow = 0
+    while (counterHour < 21.5) {
+      doubleTimeSlotToInt.put(counterHour, counterRow);
+      counterHour += 0.5
+      counterRow = counterRow + 1;
+    }
+    return doubleTimeSlotToInt;
+  }
+
   def getTableSlots(timetable: Timetable.Timetable, clashes: java.util.Set[Integer]): List[List[Integer]] ={
     val clashesScala = clashes.asScala;
     var slots: List[List[Integer]] = List()
-    var slotNum: Int = 0
-
-    val doubleTimeSlotToInt: mutable.HashMap[Double, Integer] = mutable.HashMap[Double, Integer]();
-
-    var counter = 9.0
-    var counter_ = 0
-    while (counter < 21.5) {
-      doubleTimeSlotToInt.put(counter, counter_);
-      counter += 0.5
-      counter_ = counter_ + 1;
-
-    }
+    var doubleTimeSlotToInt = this.getDoubleTimeSlotToInt();
 
     for (year <- timetable.getTable.values().asScala){
       for (term <- year.getTerms.values().asScala){
@@ -115,7 +117,6 @@ class ScalaDetectorViaModels {
                   }
                 }
               }
-              slotNum += 1
             }
 
           }
