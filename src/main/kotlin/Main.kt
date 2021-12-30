@@ -72,7 +72,7 @@ fun main(args: Array<String>) {
     timetable1.addActivity(5, 1, 1, 2, 4, 1, 9.0, 1.0, 1)
     */
 
-    val dbConnector = SingletonDBConnector.getConnector()
+    //val dbConnector = SingletonDBConnector.getConnector()
     //val timetable1 = FetchCourseTimetable(dbConnector).fetchWithYear("BSc Computer Science", 2019)!!
     
     val mainMenu = MenuScreen()

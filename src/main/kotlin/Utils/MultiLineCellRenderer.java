@@ -29,7 +29,6 @@ public class MultiLineCellRenderer extends JTextArea implements TableCellRendere
     public void clashDetectionInitiate(java.util.List<java.util.List<java.lang.Integer>> slots, int year, int term, int week, int mode){
         System.out.println("slots: " + slots);
         for (java.util.List<java.lang.Integer> slot : slots){
-            System.out.println("SLOT ELEM: " + slot);
             if (slot.get(0) == year && slot.get(1) == term && slot.get(2) == week){
                 this.clashSlots.add(slot);
             }
@@ -85,7 +84,6 @@ public class MultiLineCellRenderer extends JTextArea implements TableCellRendere
         else {
             setBorder(new EmptyBorder(1, 2, 1, 2));
         }
-
         for (java.util.List<Integer> slot : clashSlots){
             int count = 0;
             for (int elemSlot : slot) {
@@ -93,6 +91,11 @@ public class MultiLineCellRenderer extends JTextArea implements TableCellRendere
                 //System.out.println("ELEM SLOT: " + count + " = " + elemSlot);
                 count += 1;
             }
+            Integer slotId = 0;
+            if (slot.size() >= 6) {
+                slotId = slot.get(5);
+            }
+            //System.out.println("getTableCellRendererComponent ROW: " + row + "SLOT Number " + slot.get(3) + "Slot ACT ID" + slotId);
             if (row == slot.get(3) && column == slot.get(4)){
                 if (this.detectionMode == 0){
                     setBackground(Color.red);

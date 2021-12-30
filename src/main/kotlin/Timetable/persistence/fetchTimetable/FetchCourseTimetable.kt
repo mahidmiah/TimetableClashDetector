@@ -39,23 +39,26 @@ class FetchCourseTimetable(val dbConnector: DBConnector) {
 
 
         val timetable = Timetable(timetableModel.id_timetable, targetCourse.name!!, targetCourse.start_year!!, targetCourse.end_year!!, courseTypeBoolean)
+
+        val courseModules = CourseModuleModel().selectAll().filter { e -> e.id_course == targetCourse.id_course }
+
+        for (courseModule in courseModules) {
+            val moduleDoc = courseModule.fetchThisModule()
+            if (moduleDoc != null) {
+                timetable.addModule(courseModule.id_course_module!!, moduleDoc.name!!, courseModule.is_optional == 1)
+            } else {
+                throw Exception("COULD NOT FIND MODULE WITH ID: " + courseModule.id_module)
+            }
+
+        }
         //val modulesInfo: ArrayList<ModuleModel> = arrayListOf()
         //val modulesInfoHashMap: MutableMap<Int, ModuleModel> = mutableMapOf<Int, ModuleModel>()
         val courseModulesInfoHashMap: MutableMap<Int, CourseModuleModel> = mutableMapOf<Int, CourseModuleModel>()
+
         for (act in activities) {
             println("Actibity: " + act.id_activity)
             val courseModule = act.fetchThisCourseModule()
             if (courseModule != null) {
-                if (courseModulesInfoHashMap.containsKey(courseModule.id_course_module) == false) {
-                    val moduleDoc = courseModule.fetchThisModule()
-                    if (moduleDoc != null) {
-                        timetable.addModule(courseModule.id_course_module!!, moduleDoc.name!!, courseModule.is_optional == 1)
-                    } else {
-                        throw Exception("COULD NOT FIND MODULE WITH ID: " + courseModule.id_module)
-                    }
-                } else {
-                    courseModulesInfoHashMap[courseModule.id_course_module!!] = courseModule
-                }
 
                 val duration = (act.act_endtime!! - act.act_starttime!!)
 

@@ -527,7 +527,7 @@ public class MainScreen extends JFrame{
             //System.out.println("Clash detection: " + tempMap);
             //Boolean isClashing = scalaDetectorViaModels.isClashingFromClashMap(tempMap, 1);
 
-            Set<Integer> clashIds = scalaDetectorViaModels.simpleGetActivitiesIdsClashesSetAsJava(new ActivityModel().selectAll().stream().toList());
+            Set<Integer> clashIds = scalaDetectorViaModels.simpleGetActivitiesIdsClashesSetAsJava(Timetable.getActivitiesAsModels()); //new ActivityModel().selectAll().stream().toList()
             System.out.println("clashIds: " + clashIds);
             java.util.List<java.util.List<Integer>> clashSlots = scalaDetectorViaModels.getTableSlotsAsJava(Timetable, clashIds);
             renderer.clashDetectionInitiate(clashSlots, Year, Term, Week, 1);
