@@ -94,7 +94,6 @@ public class MenuScreen extends JFrame{
                         CourseModel newCourse = courseResult.getCourseModel();
                         TimetableModel newTimetable = courseResult.getTimetableModel();
                         boolean isUndergraduate = courseResult.getCourseTypeModel().getLabel().equals(CourseTypeModel.UNDERGRADUATE);
-                        //Timetable timetable = new Timetable(Integer.parseInt(courseIDTextField.getText()), courseNameTextField.getText(), Integer.parseInt(courseStartYearTextField.getText()), Integer.parseInt(courseEndYearTextField.getText()), trueFalseDict.get(courseTypeGroup.getSelection().getActionCommand()));
 
                         Timetable timetable = new Timetable(
                                 newTimetable.getId_timetable(),
