@@ -1,9 +1,7 @@
 package GUI;
 
 import ClashDetectionKotlin.KotlinDetector;
-import ClashDetectionScala.ScalaDetector;
 import ClashDetectionScala.ScalaDetectorViaModels;
-import scala.jdk.javaapi.CollectionConverters;
 
 import Persistence.Entities.activity.ActivityModel;
 import Persistence.Entities.activity_category.ActivityCategoryModel;
@@ -29,7 +27,6 @@ import javax.swing.table.DefaultTableModel;
 import java.awt.*;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
-import java.sql.Time;
 import java.util.*;
 import java.util.List;
 import java.util.logging.Logger;
@@ -238,7 +235,7 @@ public class MainScreen extends JFrame{
                         int moduleID = Integer.parseInt(String.valueOf(courseModuleJList.getSelectedValue().toString().charAt(4)));
                         try {
                             RemoveCourseModule removeCourseModule = new RemoveCourseModule();
-                            removeCourseModule.remove(moduleID);
+                            removeCourseModule.removeById(moduleID);
 
                             timetable.removeModule(moduleID);
                             update(Integer.parseInt(yearGroupRadioGroup.getSelection().getActionCommand()), Integer.parseInt(termGroupRadioGroup.getSelection().getActionCommand()), Integer.parseInt(weekGroupRadioGroup.getSelection().getActionCommand()), table);

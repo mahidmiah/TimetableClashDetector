@@ -1,14 +1,17 @@
 package use_cases.course_module.remove_course_module
 
 import Persistence.Entities.course_module.CourseModuleModel
+import Persistence.Entities.module.ModuleModel
 import Persistence.model.DeleteResult
 import Persistence.model.Model
 import use_cases.course_module.insert_course_module.UseCaseError
 import kotlin.jvm.Throws
 
+
+class RemoveCourseModuleByIdResult(val courseModuleDeleteResult: DeleteResult, val moduleDeleteResult: DeleteResult)
 class RemoveCourseModule {
     @Throws(UseCaseError::class)
-    fun remove(targetId: Int) : DeleteResult {
+    fun removeById(targetId: Int) : RemoveCourseModuleByIdResult {
         val courseModuleModel = CourseModuleModel().selectById(targetId)
         if (courseModuleModel == null) {
             throw UseCaseError("CourseModuleNotFound",
@@ -20,7 +23,10 @@ class RemoveCourseModule {
         if (deleteRes.affectedRows == 0) {
             throw UseCaseError("CourseNotDeleted", "An error occurred while deleting the course module.")
         }
-        return deleteRes;
+        val deleteModuleRes = ModuleModel().deleteById(courseModuleModel.id_module);
+
+        return RemoveCourseModuleByIdResult(deleteRes, deleteModuleRes)
+
 
 
 
