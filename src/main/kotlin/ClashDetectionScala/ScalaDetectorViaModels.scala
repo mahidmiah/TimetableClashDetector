@@ -4,7 +4,7 @@ import Persistence.Entities.activity.ActivityModel
 
 import scala.collection.mutable
 import scala.jdk.CollectionConverters.*
-
+import Timetable.Activity
 class ActivityHandler(val actModel: ActivityModel) {
 
 
@@ -84,23 +84,35 @@ class ScalaDetectorViaModels {
     var slots: List[List[Integer]] = List()
     var slotNum: Int = 0
 
+    val doubleTimeSlotToInt: mutable.HashMap[Double, Integer] = mutable.HashMap[Double, Integer]();
+
+    var counter = 9.0
+    var counter_ = 0
+    while (counter < 21.5) {
+      doubleTimeSlotToInt.put(counter, counter_);
+      counter += 0.5
+      counter_ = counter_ + 1;
+
+    }
+
     for (year <- timetable.getTable.values().asScala){
       for (term <- year.getTerms.values().asScala){
         for (week <- term.getWeeks.values().asScala){
           for (day <- week.getDays.values().asScala){
-            for (slot <- day.getTimeSlot.values().asScala){
-              if (slot != null){
+            for (slot <- day.getTimeSlot.asScala){
+              val slotHourNum: Double = slot._1 // 9.0,9.5,10,10.5 e.t.c
+              val slotActivities: scala.collection.mutable.Buffer[Activity] = slot._2.asScala // Activity
+              if (slotActivities != null){
                 System.out.println("FOR EACH SLOT: " + slot)
-                if (slot.size() > 0){
-                  for (activity <- slot.asScala){
+                if (slotActivities.size > 0){
+                  for (activity <- slotActivities){
                     if (clashes.contains(activity.getID)){
-                      slots = (List(year.getYearNumber, term.getTermNumber, week.getWeekNumber, slotNum, day.getDayNumber + 1)) :: slots
+                      val altNum = doubleTimeSlotToInt.get(slotHourNum)
+                      if (altNum.nonEmpty) {
+                        slots = (List(year.getYearNumber, term.getTermNumber, week.getWeekNumber, altNum.get, day.getDayNumber + 1, activity.getID)) :: slots
+                      }
+
                     }
-                  }
-                }
-                else {
-                  if (clashes.contains(slot.get(0).getID)){
-                    slots = (List(year.getYearNumber, term.getTermNumber, week.getWeekNumber, slotNum, day.getDayNumber + 1)) :: slots
                   }
                 }
               }

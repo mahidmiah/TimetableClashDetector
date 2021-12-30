@@ -1,5 +1,7 @@
 package Timetable
 
+import Persistence.Entities.activity.ActivityModel
+
 class Timetable (val ID: Int? = null, Name: String, StartYear: Int, EndYear: Int, Undergraduate: Boolean) {
 
     var displayLabel: String
@@ -90,6 +92,11 @@ class Timetable (val ID: Int? = null, Name: String, StartYear: Int, EndYear: Int
         }
         //Removes the module from the timetables list of modules.
         this.modules.remove(ID)
+    }
+
+    fun getActivitiesAsModels() : List<ActivityModel>{
+        //val activityIds = this.Activities.map { f -> f.key };
+        return ActivityModel().selectAll().filter { e -> this.Activities.contains(e.id_activity) }
     }
 
     fun addActivity(ID: Int, Year: Int, Term: Int, Week: Int, DayOfWeek: Int, ModuleID: Int, StartTime: Double, Duration: Double, ActivityType: Int){
