@@ -51,8 +51,6 @@ class Activity(ID: Int, ModuleID: Int, ModuleName: String, StartTime: Double, Du
     }
 
     override fun toString(): String {
-
-
         return "ID: ${this.ID} - ${this.ModuleName} - (${lessonTypes[this.ActivityType]})"
     }
 

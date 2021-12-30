@@ -71,11 +71,8 @@ public class MainScreen extends JFrame{
     private Logger logger = Logger.getLogger("MainScreen");
 
     public MainScreen(Timetable timetable){
-
-        super("Main Page");
-
+        super("Main Page")
         this.doubleTimeSlotToInt = new HashMap<Double, Integer>();
-
         this.table = timetable;
 
         double counter = 9.0;
@@ -90,25 +87,18 @@ public class MainScreen extends JFrame{
 
         this.yearAndTermPanel.setBorder(new MatteBorder(0, 0, 0, 1, Color.black));
         this.courseModulesPanel.setBorder(new MatteBorder(0, 0, 0, 1, Color.black));
-
         this.yearLabel.setBorder(new MatteBorder(0, 0, 1, 0, Color.black));
         this.termLabel.setBorder(new MatteBorder(0, 0, 1, 0, Color.black));
-
         this.courseModulesLabel.setBorder(new MatteBorder(0, 0, 1, 0, Color.black));
         this.manageActivitesLabel.setBorder(new MatteBorder(0, 0, 1, 0, Color.black));
-
         this.timeTable.setVisible(true);
         this.timeTable.setOpaque(false);
-
         String[] columns = new String[] {
                 "Time Slot", "Monday", "Tuesday", "Wednesday", "Thursday", "Friday"
         };
-
-        this.TableModel = new DefaultTableModel(25, 0);
+        this.TableModel = new DefaultTableModel(25, 6);
         TableModel.setColumnIdentifiers(columns);
-
         this.timeTable.setRowHeight(75);
-
         this.panelMain.setPreferredSize(new Dimension(1000, 700));
         this.setContentPane(this.panelMain);
         this.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
@@ -175,9 +165,6 @@ public class MainScreen extends JFrame{
                 optionalChoiceGroup.add(trueRadioButton);
                 optionalChoiceGroup.add(falseRadioButton);
 
-                //panel.add(moduleIDLabel); Remove ModuleId
-                //panel.add(moduleIDTextField);
-
                 panel.add(moduleNameLabel);
                 panel.add(moduleNameTextField);
 
@@ -191,13 +178,11 @@ public class MainScreen extends JFrame{
 
                 JOptionPane.showMessageDialog(panelMain, panel);
 
-                // removed !moduleIDTextField.getText().isEmpty() &&
                 if (!moduleNameTextField.getText().isEmpty() && optionalChoiceGroup.getSelection() != null){
                     if (timetable.getID() != null) {
                         try {
                             InsertCourseModule icm = new InsertCourseModule(timetable.getID(), moduleNameTextField.getText(), trueFalseDict.get(optionalChoiceGroup.getSelection().getActionCommand()));
                             InsertCourseModuleResult res = icm.insert();
-                            //table.addModule(Integer.parseInt(moduleIDTextField.getText()), moduleNameTextField.getText(), trueFalseDict.get(optionalChoiceGroup.getSelection().getActionCommand()));
                             CourseModuleModel courseModuleModel = res.getCourseModuleModel();
                             table.addModule(courseModuleModel.getId_course_module(), moduleNameTextField.getText(), trueFalseDict.get(optionalChoiceGroup.getSelection().getActionCommand()));
                             updateModulesList(table);
@@ -273,6 +258,8 @@ public class MainScreen extends JFrame{
         insertActivityButton.addActionListener(new ActionListener() {
             @Override
             public void actionPerformed(ActionEvent e) {
+
+                // GUI / POPUP MENU CODE
                 JPanel panel = new JPanel(new GridLayout(12, 2));
 
                 JLabel activityIDLabel = new JLabel();
@@ -297,11 +284,6 @@ public class MainScreen extends JFrame{
                 activityDurationTimeLabel.setText("Duration:");
                 activityTypeLabel.setText("Activity Type:");
 
-
-                //Omit Activity ID
-                //panel.add(activityIDLabel);
-                //panel.add(activityIDTextField);
-
                 panel.add(activityYearLabel);
                 List<Integer> years = new ArrayList<Integer>();
                 if (table.getCourseType().equals("postgraduate")){ //Postgraduate
@@ -312,7 +294,7 @@ public class MainScreen extends JFrame{
                     years.add(2);
                     years.add(3);
                 }
-                //Integer years[] = { 1, 2, 3 };
+
                 JComboBox activityYearComboBox = new JComboBox(years.toArray());
                 panel.add(activityYearComboBox);
 
@@ -392,30 +374,7 @@ public class MainScreen extends JFrame{
                         newActivity.getAct_starttime(),
                         newActivity.getAct_endtime() - newActivity.getAct_starttime(),
                         newActivity.getId_act_category());
-
-                /*
-                if (!activityIDTextField.getText().isEmpty()){
-                    if(!timetable.getActivities().containsKey(Integer.parseInt(activityIDTextField.getText()))){
-                        timetable.addActivity(Integer.parseInt(activityIDTextField.getText()),
-                                (Integer) activityYearComboBox.getSelectedItem(),
-                                (Integer) activityTermComboBox.getSelectedItem(),
-                                (Integer) activityWeekComboBox.getSelectedItem(),
-                                activityDayComboBox.getSelectedIndex(),
-                                (Integer) moduleIDComboBox.getSelectedItem(),
-                                (Double) activityStartTimeComboBox.getSelectedItem(),
-                                (Double) activityDurationComboBox.getSelectedItem(),
-                                activityTypeComboBox.getSelectedIndex() + 1);
-                        update(Integer.parseInt(yearGroupRadioGroup.getSelection().getActionCommand()), Integer.parseInt(termGroupRadioGroup.getSelection().getActionCommand()), Integer.parseInt(weekGroupRadioGroup.getSelection().getActionCommand()), table);
-                    }
-                    else {
-                        JOptionPane.showMessageDialog(panelMain, "Activity ID already exists!", "Activity ID Error", JOptionPane.ERROR_MESSAGE);
-                    }
-                }
-                else{
-                    JOptionPane.showMessageDialog(panelMain, "Please ensure all fields have correct input!", "Insert Activity Error", JOptionPane.ERROR_MESSAGE);
-                }
-                */
-
+                update(Integer.parseInt(yearGroupRadioGroup.getSelection().getActionCommand()), Integer.parseInt(termGroupRadioGroup.getSelection().getActionCommand()), Integer.parseInt(weekGroupRadioGroup.getSelection().getActionCommand()), table);
             }
         });
 
@@ -467,17 +426,12 @@ public class MainScreen extends JFrame{
 
     }
 
-    public void updateAtCell(int Row, int Column){
-
-    }
-
     public void updateModulesList(Timetable Timetable){
         DefaultListModel listOfModules = new DefaultListModel();
         Collection<Module> modules = Timetable.getModules().values();
         for (Module mod : modules){
             listOfModules.addElement(mod.toString());
         }
-
         this.courseModuleJList.setModel(listOfModules);
     }
 
@@ -516,32 +470,11 @@ public class MainScreen extends JFrame{
             renderer.clashDetectionInitiate(kotlinDetector.detect(), Year, Term, Week, 0);
         }
         else{
-            /*
-            ScalaDetector scalaDetector = new ScalaDetector(Timetable);
-            scalaDetector.detect();
-            renderer.clashDetectionInitiate(scalaDetector.detect(), Year, Term, Week, 1);
-
-             */
-
             ScalaDetectorViaModels scalaDetectorViaModels = new ScalaDetectorViaModels();
-            //https://docs.scala-lang.org/overviews/collections-2.13/conversions-between-java-and-scala-collections.html
-
-            //Map<Integer, Map<Integer, ActivityModel>> tempMap = scalaDetectorViaModels.getClashes(new ActivityModel().selectAll().stream().toList());
-            //System.out.println("Clash detection: " + tempMap);
-            //Boolean isClashing = scalaDetectorViaModels.isClashingFromClashMap(tempMap, 1);
-
             Set<Integer> clashIds = scalaDetectorViaModels.simpleGetActivitiesIdsClashesSetAsJava(new ActivityModel().selectAll().stream().toList());
             System.out.println("clashIds: " + clashIds);
             java.util.List<java.util.List<Integer>> clashSlots = scalaDetectorViaModels.getTableSlotsAsJava(Timetable, clashIds);
             renderer.clashDetectionInitiate(clashSlots, Year, Term, Week, 1);
-            /*
-            System.out.println("IS CLASHING1: " + isClashing);
-            System.out.println("IS CLASHING2: " + (clashIds.size() > 0));
-
-             */
-
-
-
         }
 
         this.timeTable.setDefaultRenderer(Object.class, renderer);

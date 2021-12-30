@@ -62,9 +62,6 @@ public class MenuScreen extends JFrame{
                 courseTypeGroup.add(trueRadioButton);
                 courseTypeGroup.add(falseRadioButton);
 
-                //anel.add(courseIDLabel);
-                //panel.add(courseIDTextField);
-
                 panel.add(courseNameLabel);
                 panel.add(courseNameTextField);
 
@@ -83,16 +80,6 @@ public class MenuScreen extends JFrame{
 
                 JOptionPane.showMessageDialog(mainPanel, panel);
                 if (!courseNameTextField.getText().isEmpty() && !courseStartYearTextField.getText().isEmpty() && !courseStartYearTextField.getText().isEmpty() && courseTypeGroup.getSelection() != null){
-//                    if(!timetable.getModules().containsKey(Integer.parseInt(moduleIDTextField.getText()))){
-//                        table.addModule(Integer.parseInt(moduleIDTextField.getText()), moduleNameTextField.getText(), trueFalseDict.get(optionalChoiceGroup.getSelection().getActionCommand()));
-//                        updateModulesList(table);
-//                    }
-//                    else {
-//                        JOptionPane.showMessageDialog(panelMain, "Module ID already exists!", "Module ID Error", JOptionPane.ERROR_MESSAGE);
-//                    }
-
-
-
 
                     InsertCourse courseCreator = new InsertCourse();
 
@@ -134,7 +121,9 @@ public class MenuScreen extends JFrame{
 
             }
         });
+
         MenuScreen self = this;
+
         loadTimetableButton.addActionListener(new ActionListener() {
             @Override
             public void actionPerformed(ActionEvent e) {
@@ -143,8 +132,6 @@ public class MenuScreen extends JFrame{
                 timetableSelectorScreen.timetableConfirmationListener = new ITimetableConfirmationListener() {
                     @Override
                     public void actionPerformed(Timetable timetable) {
-
-
                         MainScreen mainScreen = new MainScreen(timetable);
                         mainScreen.setVisible(true);
                         timetableSelectorScreen.dispose();
