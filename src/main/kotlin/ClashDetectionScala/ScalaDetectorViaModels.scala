@@ -59,14 +59,20 @@ class ActivityHandler(val actModel: ActivityModel) {
     val startTime: Double = actModel.getAct_starttime();
     val endTime: Double = actModel.getAct_endtime();
     val otherModel = other.actModel;
+    val actCourseModule = this.actModel.getId_course_module();
+    println(s"COMPARING  ${actModel.getId_activity()} vs ${otherModel.getId_activity()}");
+    println("Optional Comparison: " + (actCourseModule != otherModel.getId_course_module() || // Only validate optional if it's different modules
+      (this.actModel.isOptional() == false || otherModel.isOptional() == false)));
+    println(s"Pessimistic Comparison: " + pessimisticDateComparison(other));
     return (
       (this.actModel.getId_activity() != otherModel.getId_activity()) &&
-        (this.actModel.isOptional() == false || otherModel.isOptional() == false) && // Only calidate if one of them is NOT OPTIONAL
+        (actCourseModule == otherModel.getId_course_module() || // Only validate optional if it's different modules
+        (this.actModel.isOptional() == false || otherModel.isOptional() == false)) && // Only calidate if one of the dif is NOT OPTIONAL
       (otherModel.getYear() == year) &&
-        (otherModel.getTerm() == term) &&
-        (otherModel.getWeek() == week) &&
-        (otherModel.getDay_week() == weekDay) &&
-        pessimisticDateComparison(other)
+      (otherModel.getTerm() == term) &&
+      (otherModel.getWeek() == week) &&
+      (otherModel.getDay_week() == weekDay) &&
+      pessimisticDateComparison(other)
 
       )
   }
@@ -84,7 +90,8 @@ class ScalaDetectorViaModels {
           for (day <- week.getDays.values().asScala){
             for (slot <- day.getTimeSlot.values().asScala){
               if (slot != null){
-                if (slot.size() > 1){
+                System.out.println("FOR EACH SLOT: " + slot)
+                if (slot.size() > 0){
                   for (activity <- slot.asScala){
                     if (clashes.contains(activity.getID)){
                       slots = (List(year.getYearNumber, term.getTermNumber, week.getWeekNumber, slotNum, day.getDayNumber + 1)) :: slots
@@ -109,6 +116,7 @@ class ScalaDetectorViaModels {
 
   def getTableSlotsAsJava(timetable: Timetable.Timetable, clashes: java.util.Set[Integer]): java.util.List[java.util.List[Integer]] = {
     val slots = getTableSlots(timetable, clashes);
+    System.out.println("SLOTS SCALA: " + slots )
     var slotsToJava: java.util.List[java.util.List[Integer]] = List().asJava;
 
     val slotsJavaElements = slots.map(a => a.asJava);
