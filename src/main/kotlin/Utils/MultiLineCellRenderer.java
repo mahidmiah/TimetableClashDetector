@@ -95,10 +95,7 @@ public class MultiLineCellRenderer extends JTextArea implements TableCellRendere
             setBorder(new EmptyBorder(1, 2, 1, 2));
         }
 
-        Integer slotActivityId = 0;
-        if (slot.size() >= 6) {
-            slotActivityId = slot.get(5);
-        }
+
         //CODE THAT DISPLAYS THE CLASHES
         for (java.util.List<Integer> slot : clashSlots){
             if (row == slot.get(3) && column == slot.get(4)){
